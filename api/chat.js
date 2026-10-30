@@ -1,5 +1,4 @@
-```javascript
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // CORS Headers (Browser security fix)
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -10,7 +9,7 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // Health-check support: Browser ya site check kare to 200 OK mile
+  // Health-check support: Browser check kare to instant online status mile
   if (req.method === 'GET') {
     return res.status(200).json({ 
       status: 'online', 
@@ -23,7 +22,17 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt, history, image } = req.body || {};
+    let body = req.body;
+    if (typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch (e) {
+        body = {};
+      }
+    }
+    body = body || {};
+
+    const { prompt, history, image } = body;
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -32,7 +41,7 @@ export default async function handler(req, res) {
       });
     }
 
-    const systemPrompt = `आप 'कृषि मित्र MP' हैं - मध्य प्रदेश के किसानों के लिए समर्पित वरिष्ठ कृषि वैज्ञानिक। आपका ज्ञान JNKVV जबलपुर और RVSKVV ग्वालियर के वैज्ञानिक पैकेजों पर आधारित है। रासायनिक खाद/दवा का 15 लीटर स्प्रे पंप नाप और साथ में देशी जैविक विकल्प भी दें।`;
+    const systemPrompt = "आप 'कृषि मित्र MP' हैं - मध्य प्रदेश के किसानों के लिए समर्पित वरिष्ठ कृषि वैज्ञानिक। आपका ज्ञान JNKVV जबलपुर और RVSKVV ग्वालियर के वैज्ञानिक पैकेजों पर आधारित है। रासायनिक खाद/दवा का 15 लीटर स्प्रे पंप नाप और साथ में देशी जैविक विकल्प भी दें।";
 
     const cleanHistory = [];
     if (Array.isArray(history)) {
@@ -101,5 +110,5 @@ export default async function handler(req, res) {
   } catch (err) {
     return res.status(500).json({ error: err.message || 'सर्वर त्रुटि' });
   }
-}
+};
 ```
