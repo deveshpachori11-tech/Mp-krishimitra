@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>कृषि मित्र MP | Krishi Mitra MP - Neural Agri AI Assistant</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Marked.js for Markdown Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        kisan: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#1b5e20',
+                            900: '#144618',
+                            950: '#0c2e10'
+                        },
+                        mpGold: '#f59e0b',
+                        mpAmber: '#d97706',
+                        rabiBlue: '#1e40af',
+                        kharifGreen: '#065f46',
+                        zaidOrange: '#9a3412',
+                        organicGreen: '#15803d'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Mukta:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Mukta', 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .prose-kisan h1, .prose-kisan h2, .prose-kisan h3, .prose-kisan h4 {
+            font-weight: 800;
+            color: #14532d;
+            margin-top: 0.65rem;
+            margin-bottom: 0.35rem;
+            line-height: 1.35;
+        }
+        .prose-kisan h3 {
+            font-size: 1.1rem;
+            border-bottom: 2px solid #dcfce7;
+            padding-bottom: 0.25rem;
+        }
+        .prose-kisan h4 {
+            font-size: 0.98rem;
+            color: #166534;
+        }
+        .prose-kisan p {
+            margin-bottom: 0.5rem;
+            line-height: 1.65;
+        }
+        .prose-kisan ul {
+            list-style-type: disc;
+            padding-left: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .prose-kisan ol {
+            list-style-type: decimal;
+            padding-left: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .prose-kisan strong {
+            color: #14532d;
+            font-weight: 700;
+        }
+        .prose-kisan hr {
+            border: 0;
+            border-top: 1px dashed #cbd5e1;
+            margin: 0.6rem 0;
+        }
+
+        @keyframes mic-pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+            70% { transform: scale(1.08); box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+        .voice-active {
+            animation: mic-pulse 1.3s infinite;
+            background-color: #dc2626 !important;
+            color: white !important;
+            border-color: #b91c1c !important;
+        }
+
+        .cursor-blink {
+            display: inline-block;
+            width: 3px;
+            height: 15px;
+            background-color: #16a34a;
+            margin-left: 2px;
+            vertical-align: middle;
+            animation: blink 0.75s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden text-slate-800">
+
+    <!-- Top Brand Header -->
+    <header class="bg-gradient-to-r from-kisan-950 via-kisan-800 to-kisan-900 text-white shadow-lg shrink-0 z-30">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex items-center justify-between">
+            
+            <!-- Logo & Title -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('chat')">
+                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-mpGold/20 border border-mpGold/50 flex items-center justify-center text-mpGold text-xl shadow-inner">
+                    <i class="fa-solid fa-seedling"></i>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="text-lg sm:text-xl font-extrabold tracking-tight">कृषि मित्र MP</h1>
+                        <span class="bg-emerald-500 text-white font-black text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center space-x-1 shadow-sm">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                            <span>Live AI</span>
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-kisan-200 hidden sm:block">जवाहरलाल नेहरू (JNKVV) व राजमाता (RVSKVV) कृषि वि.वि. प्रमाणित वैज्ञानिक पैकेज</p>
+                </div>
+            </div>
+
+            <!-- Desktop Navigation Tab Bar -->
+            <nav class="hidden md:flex items-center space-x-1.5 bg-black/25 p-1 rounded-xl border border-white/10 text-xs font-bold">
+                <button id="navTabChat" onclick="switchTab('chat')" class="px-3 py-1.5 rounded-lg transition flex items-center space-x-1.5 bg-white text-kisan-900 shadow">
+                    <i class="fa-solid fa-robot text-emerald-600"></i>
+                    <span>Live AI वैज्ञानिक</span>
+                </button>
+                <button id="navTabCrops" onclick="switchTab('crops')" class="px-3 py-1.5 rounded-lg transition flex items-center space-x-1.5 text-white/80 hover:text-white hover:bg-white/10">
+                    <i class="fa-solid fa-layer-group text-amber-400"></i>
+                    <span>सम्पूर्ण 20+ फसलें</span>
+                </button>
+                <button id="navTabOrganic" onclick="switchTab('organic')" class="px-3 py-1.5 rounded-lg transition flex items-center space-x-1.5 text-white/80 hover:text-white hover:bg-white/10">
+                    <i class="fa-solid fa-leaf text-lime-400"></i>
+                    <span>🌿 जैविक खेती</span>
+                </button>
+                <button id="navTabCalc" onclick="switchTab('calc')" class="px-3 py-1.5 rounded-lg transition flex items-center space-x-1.5 text-white/80 hover:text-white hover:bg-white/10">
+                    <i class="fa-solid fa-calculator text-mpGold"></i>
+                    <span>उर्वरक कैलकुलेटर</span>
+                </button>
+                <button id="navTabDoctor" onclick="switchTab('doctor')" class="px-3 py-1.5 rounded-lg transition flex items-center space-x-1.5 text-white/80 hover:text-white hover:bg-white/10">
+                    <i class="fa-solid fa-staff-snake text-rose-400"></i>
+                    <span>रोग व कीट क्लिनिक</span>
+                </button>
+            </nav>
+
+            <!-- Actions: Key Manager & Language -->
+            <div class="flex items-center space-x-2">
+                <div class="bg-kisan-900/90 p-1 rounded-xl border border-kisan-600 flex items-center text-xs font-bold shadow-inner">
+                    <button id="langBtnHi" onclick="setLanguage('hi')" class="px-2 py-0.5 rounded-lg bg-mpGold text-kisan-950 font-extrabold shadow-sm transition">हिं</button>
+                    <button id="langBtnEn" onclick="setLanguage('en')" class="px-2 py-0.5 rounded-lg text-white hover:text-mpGold transition">En</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Mobile Navigation Tabs Bar -->
+        <div class="md:hidden flex border-t border-kisan-800/80 bg-kisan-950/95 text-[11px] font-bold overflow-x-auto no-scrollbar">
+            <button id="mTabChat" onclick="switchTab('chat')" class="flex-1 py-2 px-2 text-center text-mpGold border-b-2 border-mpGold flex items-center justify-center space-x-1 whitespace-nowrap">
+                <i class="fa-solid fa-robot"></i>
+                <span>Live AI</span>
+            </button>
+            <button id="mTabCrops" onclick="switchTab('crops')" class="flex-1 py-2 px-2 text-center text-white/70 border-b-2 border-transparent flex items-center justify-center space-x-1 whitespace-nowrap">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>20+ फसलें</span>
+            </button>
+            <button id="mTabOrganic" onclick="switchTab('organic')" class="flex-1 py-2 px-2 text-center text-white/70 border-b-2 border-transparent flex items-center justify-center space-x-1 whitespace-nowrap">
+                <i class="fa-solid fa-leaf text-lime-400"></i>
+                <span>जैविक</span>
+            </button>
+            <button id="mTabCalc" onclick="switchTab('calc')" class="flex-1 py-2 px-2 text-center text-white/70 border-b-2 border-transparent flex items-center justify-center space-x-1 whitespace-nowrap">
+                <i class="fa-solid fa-calculator"></i>
+                <span>खाद गणना</span>
+            </button>
+            <button id="mTabDoctor" onclick="switchTab('doctor')" class="flex-1 py-2 px-2 text-center text-white/70 border-b-2 border-transparent flex items-center justify-center space-x-1 whitespace-nowrap">
+                <i class="fa-solid fa-staff-snake"></i>
+                <span>कीट-रोग</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 overflow-hidden relative max-w-7xl w-full mx-auto flex flex-col bg-slate-50">
+
+        <!-- ========================================================================= -->
+        <!-- TAB 1: ULTRA-REALISTIC GENERATIVE AI CHATBOT                              -->
+        <!-- ========================================================================= -->
+        <section id="tabViewChat" class="flex-1 flex flex-col h-full overflow-hidden bg-slate-50">
+            
+            <!-- Quick Chips Bar (Top) -->
+            <div class="border-b border-kisan-100 bg-kisan-50/90 px-3 py-2 shrink-0">
+                <div class="flex items-center space-x-2 overflow-x-auto no-scrollbar py-0.5" id="chatChipsContainer"></div>
+            </div>
+
+            <!-- AI Status Bar -->
+            <div id="aiModeBar" class="bg-emerald-500/10 border-b border-emerald-500/20 px-3 py-1.5 text-[11px] flex items-center justify-between text-emerald-950 font-semibold shrink-0">
+                <span class="flex items-center space-x-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="aiModeText">सक्रिय AI इंजन: Vercel Cloud Live AI (सुरक्षित सर्वर मोड)</span>
+                </span>
+                <span class="text-[10px] text-emerald-800 bg-emerald-100/70 border border-emerald-300 px-2 py-0.5 rounded-full font-bold hidden sm:inline-block">
+                    JNKVV जबलपुर एवं RVSKVV ग्वालियर सम्मत
+                </span>
+            </div>
+
+            <!-- Messages Stream Area -->
+            <div id="chatMessagesScroll" class="flex-1 overflow-y-auto p-3 sm:p-5 space-y-4">
+                
+                <!-- Inspiring Introduction Card -->
+                <div id="chatWelcomeCard" class="bg-gradient-to-br from-white via-kisan-50/70 to-amber-50/50 border border-kisan-200/90 rounded-2xl p-4 sm:p-5 shadow-sm">
+                    <div class="flex items-start space-x-3.5">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-kisan-800 to-kisan-950 text-mpGold flex items-center justify-center text-2xl shrink-0 shadow-md">
+                            <i class="fa-solid fa-hands-holding-circle"></i>
+                        </div>
+                        <div class="space-y-1.5 flex-1">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <h2 class="text-base sm:text-lg font-black text-kisan-950">
+                                    राम-राम किसान भाई! आपका अपना डिजिटल कृषि वैज्ञानिक
+                                </h2>
+                                <span class="bg-kisan-100 border border-kisan-300 text-kisan-900 font-extrabold text-[10px] px-2.5 py-0.5 rounded-full">
+                                    निःशुल्क किसान सेवा
+                                </span>
+                            </div>
+
+                            <p class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                                <strong>'कृषि मित्र MP'</strong> मध्य प्रदेश के किसानों के लिए समर्पित है। जवाहरलाल नेहरू (JNKVV जबलपुर) व राजमाता (RVSKVV ग्वालियर) कृषि विश्वविद्यालयों के वैज्ञानिक पैकेजों के आधार पर हर एक प्रश्न का <strong>सटीक लाइव AI समाधान</strong> प्रस्तुत होता है।
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Highlight Badges -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3.5 pt-3 border-t border-kisan-100 text-xs font-semibold text-slate-700">
+                        <div class="flex items-center space-x-1.5 bg-white p-2 rounded-xl border border-slate-100 shadow-xs">
+                            <i class="fa-solid fa-bolt text-amber-500"></i>
+                            <span>100% लाइव AI सलाह</span>
+                        </div>
+                        <div class="flex items-center space-x-1.5 bg-white p-2 rounded-xl border border-slate-100 shadow-xs">
+                            <i class="fa-solid fa-microphone text-rose-500"></i>
+                            <span>बोलकर सवाल पूछें</span>
+                        </div>
+                        <div class="flex items-center space-x-1.5 bg-white p-2 rounded-xl border border-slate-100 shadow-xs">
+                            <i class="fa-solid fa-camera text-emerald-600"></i>
+                            <span>पत्ती की फोटो भेजें</span>
+                        </div>
+                        <div class="flex items-center space-x-1.5 bg-white p-2 rounded-xl border border-slate-100 shadow-xs">
+                            <i class="fa-solid fa-volume-high text-blue-600"></i>
+                            <span>उत्तर बोलकर सुनें</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages Stream List -->
+                <div id="chatMessagesList" class="space-y-4"></div>
+
+                <!-- Thinking Spinner -->
+                <div id="chatThinkingIndicator" class="hidden flex items-start space-x-2.5">
+                    <div class="w-8 h-8 rounded-full bg-kisan-800 text-mpGold flex items-center justify-center text-xs shrink-0 shadow">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="bg-white border border-kisan-200 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex items-center space-x-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-bounce"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-bounce [animation-delay:0.2s]"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-bounce [animation-delay:0.4s]"></span>
+                        <span class="text-xs text-slate-600 font-bold ml-1.5">कृषि मित्र लाइव AI द्वारा वैज्ञानिक परामर्श तैयार हो रहा है...</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Bottom Sticky Input Container -->
+            <div class="shrink-0 bg-white border-t border-slate-200 px-3 py-2 sm:px-6 shadow-xl z-20">
+                
+                <!-- Attached Image Preview Bar -->
+                <div id="imagePreviewCard" class="hidden mb-2 max-w-4xl mx-auto bg-slate-50 border border-kisan-300 rounded-xl p-2 flex items-center justify-between shadow-sm">
+                    <div class="flex items-center space-x-2.5">
+                        <img id="attachedThumbnail" src="" alt="Crop photo" class="w-12 h-12 object-cover rounded-lg border-2 border-kisan-600">
+                        <div class="text-xs">
+                            <p class="font-bold text-kisan-900">पौधे/पत्ती की फोटो संलग्न है</p>
+                            <p class="text-slate-500">लाइव AI विज़न इंजन द्वारा पौधे का विश्लेषण किया जाएगा</p>
+                        </div>
+                    </div>
+                    <button onclick="removeAttachedImage()" class="text-rose-500 hover:text-rose-700 p-2 rounded-lg hover:bg-rose-50 transition">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Live Voice Recording Banner -->
+                <div id="voiceListeningBanner" class="hidden mb-2 max-w-4xl mx-auto bg-rose-600 text-white font-bold text-xs py-2 px-4 rounded-xl shadow-lg flex items-center justify-between animate-pulse">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-white animate-ping"></span>
+                        <span>🎙️ आपकी आवाज सुन रहे हैं... कृपया अपनी समस्या बोलिए!</span>
+                    </div>
+                    <button type="button" onclick="stopSpeechRecording()" class="bg-rose-800 hover:bg-rose-900 px-2.5 py-1 rounded-lg text-[11px] font-bold">
+                        समाप्त / Stop
+                    </button>
+                </div>
+
+                <!-- Input Form -->
+                <div class="max-w-4xl mx-auto bg-slate-50 rounded-2xl border border-slate-300 p-1.5 sm:p-2">
+                    <form id="chatInputForm" onsubmit="handleChatSubmit(event)" class="flex items-end space-x-1.5 sm:space-x-2">
+                        
+                        <!-- Camera Input -->
+                        <input type="file" id="cameraFileInput" accept="image/*" class="hidden" onchange="onCropImageSelected(event)">
+
+                        <!-- Camera Button -->
+                        <button type="button" onclick="document.getElementById('cameraFileInput').click()" 
+                                title="पौधे की फोटो जोड़ें / Attach Crop Photo"
+                                class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white hover:bg-kisan-100 text-slate-700 hover:text-kisan-800 flex items-center justify-center transition active:scale-95 shrink-0 border border-slate-200 shadow-xs">
+                            <i class="fa-solid fa-camera text-base sm:text-lg"></i>
+                        </button>
+
+                        <!-- Voice Microphone (STT) Button -->
+                        <button type="button" id="micRecordBtn" onclick="toggleSpeechRecording()" 
+                                title="बोलकर पूछें / Tap to speak"
+                                class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white hover:bg-amber-100 text-slate-700 hover:text-amber-800 flex items-center justify-center transition active:scale-95 shrink-0 border border-slate-200 shadow-xs">
+                            <i class="fa-solid fa-microphone text-base sm:text-lg" id="micIconEl"></i>
+                        </button>
+
+                        <!-- Input Text Area -->
+                        <div class="flex-1 relative">
+                            <textarea id="chatTextInput" rows="1" 
+                                      placeholder="अपनी खेती का सवाल लिखें (जैसे: गेहूं में खरपतवार, पहला पानी, चने की इल्ली)..." 
+                                      class="w-full bg-white focus:bg-white border border-slate-300 focus:border-kisan-600 rounded-xl sm:rounded-2xl px-3.5 py-2.5 text-sm sm:text-base focus:ring-2 focus:ring-kisan-600/20 resize-none outline-none max-h-28 transition leading-relaxed text-slate-800 shadow-inner"
+                                      onkeydown="onChatKeydown(event)"></textarea>
+                        </div>
+
+                        <!-- Send Button -->
+                        <button type="submit" id="chatSendBtn" 
+                                class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-kisan-700 to-kisan-900 hover:from-kisan-800 hover:to-kisan-950 text-white flex items-center justify-center shadow-lg active:scale-95 transition shrink-0 cursor-pointer">
+                            <i class="fa-solid fa-paper-plane text-sm sm:text-base"></i>
+                        </button>
+
+                    </form>
+                    <div class="flex items-center justify-between text-[11px] text-slate-500 px-2 pt-1 font-medium">
+                        <span>🌾 लाइव AI: JNKVV जबलपुर एवं RVSKVV ग्वालियर वैज्ञानिक ज्ञान आधारित</span>
+                        <span class="text-emerald-700 font-bold hidden sm:inline-block">100% Real-Time Live AI</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 2: CROPS CLASSIFICATION (COMPLETE 20+ MADHYA PRADESH CROPS)           -->
+        <!-- ========================================================================= -->
+        <section id="tabViewCrops" class="hidden flex-1 overflow-y-auto p-3 sm:p-6 space-y-6">
+            
+            <div class="bg-gradient-to-r from-kisan-900 via-kisan-800 to-emerald-900 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-white shadow-md relative overflow-hidden">
+                <div class="max-w-3xl space-y-2 relative z-10">
+                    <div class="inline-flex items-center space-x-2 bg-mpGold/20 border border-mpGold/40 px-3 py-0.5 rounded-full text-xs text-mpGold font-extrabold">
+                        <i class="fa-solid fa-award"></i>
+                        <span>मध्य प्रदेश सम्पूर्ण फसल चक्र एवं बेसल खाद पैकेज गाइड</span>
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-black tracking-tight">
+                        मध्य प्रदेश की सभी प्रमुख 20+ रबी, खरीफ व जायद फसलें
+                    </h2>
+                    <p class="text-xs sm:text-sm text-emerald-100 leading-relaxed">
+                        मालवा, निमाड़, चंबल, बुंदेलखंड व महाकौशल की मिट्टी अनुसार वैज्ञानिक बेसल खाद (बुवाई पर SSP vs DAP, पोटाश व जिंक) का सम्पूर्ण पैकेज।
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
+                <div>
+                    <h3 class="font-extrabold text-base text-slate-800">फसल श्रेणी चुनें (Crops by Season)</h3>
+                    <p class="text-xs text-slate-500">मौसम अनुसार फसल चुनें और बुवाई के समय का सर्वोत्तम खाद जानें</p>
+                </div>
+
+                <div class="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-xl text-xs font-bold overflow-x-auto no-scrollbar">
+                    <button onclick="filterCropsBySeason('all')" id="btnCropAll" class="px-3.5 py-1.5 rounded-lg bg-kisan-800 text-white shadow transition">
+                        सभी फसलें (All - 20+)
+                    </button>
+                    <button onclick="filterCropsBySeason('kharif')" id="btnCropKharif" class="px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-kharifGreen transition flex items-center space-x-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                        <span>खरीफ (Kharif)</span>
+                    </button>
+                    <button onclick="filterCropsBySeason('rabi')" id="btnCropRabi" class="px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-rabiBlue transition flex items-center space-x-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                        <span>रबी (Rabi)</span>
+                    </button>
+                    <button onclick="filterCropsBySeason('zaid')" id="btnCropZaid" class="px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-zaidOrange transition flex items-center space-x-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-600"></span>
+                        <span>जायद (Zaid)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="cropsCatalogGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 3: ORGANIC & NATURAL FARMING SECTION                                  -->
+        <!-- ========================================================================= -->
+        <section id="tabViewOrganic" class="hidden flex-1 overflow-y-auto p-3 sm:p-6 space-y-6">
+            
+            <div class="bg-gradient-to-r from-emerald-950 via-kisan-900 to-teal-900 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-white shadow-md relative overflow-hidden">
+                <div class="max-w-3xl space-y-2 relative z-10">
+                    <div class="inline-flex items-center space-x-2 bg-lime-400/20 border border-lime-400/40 px-3 py-0.5 rounded-full text-xs text-lime-300 font-extrabold">
+                        <i class="fa-solid fa-leaf"></i>
+                        <span>शून्य बजट प्राकृतिक खेती एवं जैविक कृषि महा-अभियान (मध्य प्रदेश)</span>
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-black tracking-tight">
+                        देशी गौ-आधारित जैविक एवं प्राकृतिक खेती संपूर्ण मार्गदर्शिका
+                    </h2>
+                    <p class="text-xs sm:text-sm text-emerald-100 leading-relaxed">
+                        रासायनिक खाद और कीटनाशकों से मुक्ति पाकर मिट्टी की उर्वरा शक्ति बढ़ाएं और फसल लागत शून्य करें। जीवामृत, बीजामृत, नीमास्त्र, ब्रह्मास्त्र निर्माण विधि।
+                    </p>
+                </div>
+            </div>
+
+            <!-- 1-Click Interactive Jeevamrit Batch Calculator -->
+            <div class="bg-white rounded-2xl border border-emerald-200 p-4 sm:p-5 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-emerald-100">
+                    <div class="flex items-center space-x-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-lime-100 text-lime-800 flex items-center justify-center font-bold text-lg">
+                            <i class="fa-solid fa-calculator"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-black text-slate-900 text-sm sm:base">जीवामृत घोल कैलकुलेटर (1 सिंचाई डोज)</h3>
+                            <p class="text-[11px] text-slate-500">रकबा डालें और सटीक घटक (गोबर, गोमूत्र, गुड़, बेसन, मिट्टी) जानें</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2">
+                        <input type="number" id="organicAreaInput" value="1" min="0.25" step="0.25" class="w-20 bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-1 text-xs font-bold text-slate-800 outline-none text-center">
+                        <select id="organicUnitSelect" class="bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-1 text-xs font-bold text-slate-800 outline-none">
+                            <option value="acre">एकड़</option>
+                            <option value="bigha">बीघा (MP)</option>
+                        </select>
+                        <button onclick="calculateJeevamritDose()" class="bg-kisan-700 hover:bg-kisan-800 text-white font-bold text-xs px-3 py-1 rounded-xl shadow transition">
+                            गणना करें
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 5 Ingredients Result Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-center text-xs">
+                    <div class="bg-amber-50/70 border border-amber-200 p-2.5 rounded-xl">
+                        <span class="text-amber-900 font-bold block mb-0.5">देसी गाय का गोबर</span>
+                        <span id="orgDung" class="text-base sm:text-lg font-black text-amber-950">10 kg</span>
+                    </div>
+                    <div class="bg-yellow-50/70 border border-yellow-200 p-2.5 rounded-xl">
+                        <span class="text-yellow-900 font-bold block mb-0.5">देसी गोमूत्र</span>
+                        <span id="orgUrine" class="text-base sm:text-lg font-black text-yellow-950">10 लीटर</span>
+                    </div>
+                    <div class="bg-orange-50/70 border border-orange-200 p-2.5 rounded-xl">
+                        <span class="text-orange-900 font-bold block mb-0.5">पुराना गुड़</span>
+                        <span id="orgJaggery" class="text-base sm:text-lg font-black text-orange-950">2 kg</span>
+                    </div>
+                    <div class="bg-emerald-50/70 border border-emerald-200 p-2.5 rounded-xl">
+                        <span class="text-emerald-900 font-bold block mb-0.5">बेसन (दलहन आटा)</span>
+                        <span id="orgFlour" class="text-base sm:text-lg font-black text-emerald-950">2 kg</span>
+                    </div>
+                    <div class="bg-slate-100 border border-slate-200 p-2.5 rounded-xl col-span-2 sm:col-span-1">
+                        <span class="text-slate-800 font-bold block mb-0.5">सजीव मेड़ मिट्टी + पानी</span>
+                        <span id="orgWater" class="text-base sm:text-lg font-black text-slate-900">मुट्ठी भर + 200L</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Core Organic Preparations Cards -->
+            <div class="space-y-3">
+                <h3 class="font-extrabold text-base text-slate-900">प्रमुख प्राकृतिक घटक: निर्माण विधि व 15L पंप स्प्रे डोज</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="organicCardsGrid">
+                    
+                    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition space-y-2 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                <span class="bg-lime-100 text-lime-900 font-black text-xs px-2.5 py-0.5 rounded-full">बीज संस्कार</span>
+                                <span class="text-xs font-bold text-slate-800">बीजामृत (Beejamrit)</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-2"><strong>उद्देश्य:</strong> बीजों को फफूंद व दीमक से बचाना और 95%+ जमाव सुनिश्चित करना।</p>
+                            <div class="bg-slate-50 p-2 rounded-xl text-xs space-y-1 mt-2 text-slate-700">
+                                <div><strong>घटक:</strong> 5L पानी, 5kg गाय का गोबर, 5L गोमूत्र, 50g चूना और मुट्ठी भर मेड़ मिट्टी।</div>
+                                <div><strong>प्रयोग:</strong> 24 घंटे बाद बीजों पर हल्का छिड़क कर छाया में सुखाएं और बुवाई करें।</div>
+                            </div>
+                        </div>
+                        <button onclick="askAIAboutOrganic('बीजामृत से गेहूं या चने का बीज उपचार कैसे करें और क्या लाभ हैं?')" class="w-full mt-3 bg-kisan-50 hover:bg-kisan-100 text-kisan-900 font-bold text-xs py-1.5 rounded-lg border border-kisan-200 transition">
+                            AI से बीजामृत विधि पूछें
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition space-y-2 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                <span class="bg-amber-100 text-amber-900 font-black text-xs px-2.5 py-0.5 rounded-full">बेसल जैविक खाद</span>
+                                <span class="text-xs font-bold text-slate-800">घनजीवामृत (DAP का विकल्प)</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-2"><strong>उद्देश्य:</strong> बुवाई के समय रासायनिक DAP व यूरिया के स्थान पर भूमि में सजीव सूक्ष्मजीव पहुंचाना।</p>
+                            <div class="bg-slate-50 p-2 rounded-xl text-xs space-y-1 mt-2 text-slate-700">
+                                <div><strong>घटक:</strong> 100 kg सूखा गोबर खाद + 20 लीटर ताजा जीवामृत घोल।</div>
+                                <div><strong>प्रयोग:</strong> छांव में सुखाकर बुवाई के समय प्रति एकड़ 100-200 kg कतारों में दें।</div>
+                            </div>
+                        </div>
+                        <button onclick="askAIAboutOrganic('घनजीवामृत कैसे बनाएं और बुवाई के समय DAP की जगह इसका प्रयोग कैसे करें?')" class="w-full mt-3 bg-kisan-50 hover:bg-kisan-100 text-kisan-900 font-bold text-xs py-1.5 rounded-lg border border-kisan-200 transition">
+                            AI से घनजीवामृत विधि पूछें
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition space-y-2 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                                <span class="bg-emerald-100 text-emerald-900 font-black text-xs px-2.5 py-0.5 rounded-full">रसचूसक कीट नियंत्रण</span>
+                                <span class="text-xs font-bold text-slate-800">नीमास्त्र (Neemastra)</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-2"><strong>उद्देश्य:</strong> माहू (चेपा), सफेद मक्खी व थ्रिप्स का खात्मा।</p>
+                            <div class="bg-slate-50 p-2 rounded-xl text-xs space-y-1 mt-2 text-slate-700">
+                                <div><strong>घटक:</strong> 100L पानी + 5kg नीम पत्तियां + 5L गोमूत्र + 1kg गाय गोबर। 48 घंटे सड़ाएं।</div>
+                                <div class="text-emerald-800 font-bold">15 लीटर पंप स्प्रे: सीधे छानकर 500 ml प्रति पंप छिड़कें।</div>
+                            </div>
+                        </div>
+                        <button onclick="askAIAboutOrganic('नीमास्त्र बनाने का फार्मूला और सरसों या सोयाबीन में माहू-सफेद मक्खी पर स्प्रे का समय बताएं।')" class="w-full mt-3 bg-kisan-50 hover:bg-kisan-100 text-kisan-900 font-bold text-xs py-1.5 rounded-lg border border-kisan-200 transition">
+                            AI से नीमास्त्र विधि पूछें
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 4: MADHYA PRADESH FERTILIZER CALCULATOR                               -->
+        <!-- ========================================================================= -->
+        <section id="tabViewCalc" class="hidden flex-1 overflow-y-auto p-3 sm:p-6 space-y-6">
+            
+            <div class="bg-gradient-to-r from-amber-600 via-amber-700 to-kisan-900 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-white shadow-md">
+                <div class="flex items-center space-x-3 mb-2">
+                    <div class="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center text-2xl text-mpGold">
+                        <i class="fa-solid fa-calculator"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-black">म.प्र. सम्पूर्ण उर्वरक बोरी कैलकुलेटर</h2>
+                        <p class="text-xs text-amber-100">JNKVV जबलपुर और RVSKVV ग्वालियर अनुशंसित डोज अनुसार यूरिया (45kg), DAP, MOP व SSP की वैज्ञानिक गणना</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculator Input Box -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-5">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">फसल चुनें (Select Any MP Crop):</label>
+                        <select id="calcCropSelect" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-kisan-600/20 focus:border-kisan-600 outline-none">
+                            <optgroup label="रबी फसलें (Rabi Crops)">
+                                <option value="wheat" selected>🌾 गेहूं - शरबती/लोकवन/GW322 (Wheat)</option>
+                                <option value="chana">🟤 चना व डॉलर चना (Gram / Dollar Chana)</option>
+                                <option value="mustard">🟡 सरसों व राई (Mustard - चंबल/ग्वालियर)</option>
+                                <option value="garlic">🧄 लहसुन (Garlic - मंदसौर/नीमच)</option>
+                                <option value="onion">🧅 प्याज (Onion - खंडवा/मालवा)</option>
+                                <option value="potato">🥔 आलू (Potato - इंदौर/छिंदवाड़ा)</option>
+                                <option value="coriander">🌿 धनिया (Coriander - गुना/नीमच)</option>
+                                <option value="masoor">🟤 मसूर (Lentil / Masoor)</option>
+                                <option value="pea">🟢 मटर (Green Peas)</option>
+                            </optgroup>
+                            <optgroup label="खरीफ फसलें (Kharif Crops)">
+                                <option value="soybean">🌱 सोयाबीन (Soybean - JS 9560/2034)</option>
+                                <option value="paddy">🌾 धान (Paddy - बालाघाट चिन्नौर/क्रांति)</option>
+                                <option value="cotton">☁️ कपास (Bt Cotton - निमाड़/खरगोन)</option>
+                                <option value="maize">🌽 मक्का (Maize - छिंदवाड़ा)</option>
+                                <option value="groundnut">🥜 मूंगफली (Groundnut - शिवपुरी)</option>
+                                <option value="arhar">🟤 तुअर / अरहर (Tur / Arhar)</option>
+                                <option value="urad">⚫ उड़द (Black Gram / Urad)</option>
+                                <option value="chilli">🌶️ मिर्च (Chilli - खरगोन)</option>
+                                <option value="tomato">🍅 टमाटर (Tomato)</option>
+                                <option value="bajra">🌾 बाजरा (Pearl Millet - चंबल)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">खेत का रकबा (Area):</label>
+                        <input type="number" id="calcAreaInput" value="1" min="0.25" step="0.25" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm font-semibold text-slate-800 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">इकाई (Unit):</label>
+                        <select id="calcUnitSelect" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-sm font-semibold text-slate-800 outline-none">
+                            <option value="acre">एकड़ (Acre)</option>
+                            <option value="bigha">बीघा (MP Bigha)</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <button onclick="calculateMPFertilizerDose()" class="w-full sm:w-auto bg-kisan-700 hover:bg-kisan-800 text-white font-extrabold px-6 py-2.5 rounded-xl shadow transition active:scale-95 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-calculator text-mpGold"></i>
+                    <span>उर्वरक की बोरियों की सटीक गणना करें</span>
+                </button>
+
+                <!-- Calculation Result Container -->
+                <div id="calcResultsCard" class="hidden mt-6 pt-5 border-t border-slate-200 space-y-5">
+                    
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-kisan-50 p-3.5 rounded-xl border border-kisan-200">
+                        <div>
+                            <span class="text-xs font-bold text-kisan-800 uppercase tracking-wide">म.प्र. कृषि वि.वि. अनुशंसित कुल खाद</span>
+                            <h4 id="calcOutputTitle" class="text-base sm:lg font-black text-kisan-950">1 एकड़ के लिए आवश्यक खाद</h4>
+                        </div>
+                        <span id="calcAreaTag" class="bg-white border border-kisan-300 text-kisan-900 font-extrabold text-xs px-3 py-1 rounded-full self-start sm:self-auto">1 एकड़</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 text-center shadow-xs">
+                            <span class="text-xs text-emerald-800 font-bold block mb-1">नीम कोटेड यूरिया (45kg)</span>
+                            <span id="resUreaBags" class="text-2xl font-black text-emerald-950">0 बोरी</span>
+                            <span id="resUreaKg" class="text-[11px] text-slate-500 block mt-0.5">0 किग्रा</span>
+                        </div>
+
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3.5 text-center shadow-xs">
+                            <span class="text-xs text-blue-800 font-bold block mb-1">डीएपी (DAP - 50kg)</span>
+                            <span id="resDAPBags" class="text-2xl font-black text-blue-950">0 बोरी</span>
+                            <span id="resDAPKg" class="text-[11px] text-slate-500 block mt-0.5">0 किग्रा</span>
+                        </div>
+
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-center shadow-xs">
+                            <span class="text-xs text-amber-800 font-bold block mb-1">पोटाश (MOP - 50kg)</span>
+                            <span id="resMOPBags" class="text-2xl font-black text-amber-950">0 बोरी</span>
+                            <span id="resMOPKg" class="text-[11px] text-slate-500 block mt-0.5">0 किग्रा</span>
+                        </div>
+
+                        <div class="bg-purple-50 border border-purple-200 rounded-xl p-3.5 text-center shadow-xs">
+                            <span class="text-xs text-purple-800 font-bold block mb-1">एसएसपी (SSP - 50kg)</span>
+                            <span id="resSSPBags" class="text-2xl font-black text-purple-950">0 बोरी</span>
+                            <span id="resSSPKg" class="text-[11px] text-purple-700 block mt-0.5 font-semibold">DAP का श्रेष्ठ विकल्प</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 text-xs space-y-3">
+                        <div class="flex items-center space-x-2 font-black text-slate-900 text-sm pb-2 border-b border-slate-100">
+                            <i class="fa-solid fa-clock-rotate-left text-kisan-700"></i>
+                            <span>खाद देने का वैज्ञानिक समय:</span>
+                        </div>
+                        <ul id="calcSplitsList" class="space-y-2 text-slate-700"></ul>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- TAB 5: COMPREHENSIVE PEST & DISEASE CLINIC                                -->
+        <!-- ========================================================================= -->
+        <section id="tabViewDoctor" class="hidden flex-1 overflow-y-auto p-3 sm:p-6 space-y-6">
+            
+            <div class="bg-gradient-to-r from-rose-700 via-rose-800 to-kisan-900 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-white shadow-md">
+                <div class="flex items-center space-x-3 mb-2">
+                    <div class="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center text-2xl text-rose-200">
+                        <i class="fa-solid fa-staff-snake"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-black">म.प्र. सम्पूर्ण कीट एवं फसल रोग क्लिनिक (विस्तृत निदान)</h2>
+                        <p class="text-xs text-rose-100">सोयाबीन, गेहूं, चना, सरसों, लहसुन, कपास, मक्का आदि के रोगों का 15L पंप इलाज</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Crop Filter for Doctor -->
+            <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+                <div class="flex items-center space-x-2 shrink-0">
+                    <i class="fa-solid fa-filter text-rose-600"></i>
+                    <span class="text-xs font-bold text-slate-800">फसल अनुसार रोग छांटें:</span>
+                </div>
+                <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar py-1" id="doctorFilterBar">
+                    <button onclick="filterDoctorByCrop('all')" class="doc-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-rose-700 text-white shadow">सभी (All - 18+)</button>
+                    <button onclick="filterDoctorByCrop('सोयाबीन')" class="doc-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-rose-50">सोयाबीन</button>
+                    <button onclick="filterDoctorByCrop('गेहूं')" class="doc-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-rose-50">गेहूं</button>
+                    <button onclick="filterDoctorByCrop('चना')" class="doc-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-rose-50">चना</button>
+                    <button onclick="filterDoctorByCrop('सरसों')" class="doc-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-rose-50">सरसों</button>
+                    <button onclick="filterDoctorByCrop('लहसुन')" class="doc-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-rose-50">लहसुन</button>
+                    <button onclick="filterDoctorByCrop('कपास')" class="doc-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-rose-50">कपास</button>
+                    <button onclick="filterDoctorByCrop('मक्का')" class="doc-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-rose-50">मक्का</button>
+                </div>
+            </div>
+
+            <!-- Disease Cards Grid -->
+            <div class="space-y-4">
+                <h3 class="font-extrabold text-base text-slate-800">मध्य प्रदेश के प्रमुख कीट व रोग (लक्षण, 15L पंप दवा व जैविक उपचार)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="pestDoctorGrid"></div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Permanent Bottom Non-Overlapping Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-2 px-4 text-xs shrink-0 border-t border-slate-800 flex items-center justify-between z-10">
+        <div class="flex items-center space-x-2 text-slate-300">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="font-bold">कृषि मित्र MP</span>
+            <span class="text-slate-600 hidden sm:inline">•</span>
+            <span class="text-slate-400 hidden sm:inline">मध्य प्रदेश किसान सेवा एवं अनुसंधान</span>
+        </div>
+        <div class="text-right">
+            <span class="text-slate-400">Created by: </span>
+            <a href="mailto:sharmadevesh3p@gmail.com" class="text-mpGold hover:underline font-mono font-bold">sharmadevesh3p@gmail.com</a>
+        </div>
+    </footer>
+
+    <!-- Offline AI Switch Confirmation Modal -->
+    <div id="offlineConfirmModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-sm sm:max-w-md w-full p-5 shadow-2xl space-y-4 border border-amber-300">
+            <div class="flex items-start space-x-3.5">
+                <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center text-xl shrink-0 shadow-inner">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div class="flex-1 space-y-1">
+                    <h3 class="text-base font-black text-slate-900">लाइव AI सर्वर अनुपलब्ध</h3>
+                    <p class="text-xs text-slate-700 leading-relaxed font-bold">
+                        क्या आप ऑफलाइन AI में स्विच करना चाहते हैं?
+                    </p>
+                </div>
+            </div>
+
+            <!-- Mandatory Small Warning Box -->
+            <div class="bg-amber-50/90 border border-amber-200/90 rounded-xl p-2.5">
+                <p class="text-[10px] text-amber-900 leading-relaxed font-semibold">
+                    ⚠️ ऑफलाइन AI गलत उत्तर दे सकता है तो सावधानी से इस्तेमाल करे।
+                </p>
+            </div>
+
+            <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-100">
+                <button onclick="cancelOfflineSwitch()" class="px-4 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition active:scale-95">
+                    नहीं
+                </button>
+                <button onclick="confirmOfflineSwitch()" class="px-4 py-1.5 rounded-xl text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white shadow transition active:scale-95 flex items-center space-x-1">
+                    <i class="fa-solid fa-check"></i>
+                    <span>हाँ</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Notification Toast -->
+    <div id="appToast" class="fixed top-16 left-1/2 -translate-x-1/2 bg-slate-900/95 text-white text-xs px-4 py-2 rounded-full shadow-2xl transition-opacity duration-300 opacity-0 pointer-events-none z-50 flex items-center space-x-2">
+        <i class="fa-solid fa-circle-info text-mpGold"></i>
+        <span id="appToastText">सूचना</span>
+    </div>
+
+    <!-- Complete Integrated JavaScript Engine -->
+    <script>
+        let currentLang = 'hi';
+        let currentActiveTab = 'chat';
+        let isChatWaiting = false;
+        let selectedCropPhotoBase64 = null;
+        let speechRecognitionInstance = null;
+        let isMicRecording = false;
+        let activeUtteranceSpeaker = null;
+
+        let pendingOfflineQuery = null;
+        let chatConversationHistory = [];
+
+        // =========================================================================
+        // VERCEL SERVERLESS BACKEND CALL (/api/chat) - ZERO KEY IN FRONTEND
+        // =========================================================================
+        async function queryLiveGeminiAI(userPrompt, imageBase64 = null) {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    prompt: userPrompt,
+                    history: chatConversationHistory.slice(-8),
+                    image: imageBase64
+                })
+            });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error || `सर्वर रिस्पॉन्स कोड: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (!data.reply) {
+                throw new Error("AI सर्वर से खाली उत्तर मिला");
+            }
+            return data.reply;
+        }
+
+        // =========================================================================
+        // OFFLINE POPUP SWITCH MODAL LOGIC
+        // =========================================================================
+        function showOfflineConfirmModal(promptText, hasPhoto) {
+            pendingOfflineQuery = { promptText, hasPhoto };
+            document.getElementById('offlineConfirmModal').classList.remove('hidden');
+        }
+
+        function cancelOfflineSwitch() {
+            document.getElementById('offlineConfirmModal').classList.add('hidden');
+            pendingOfflineQuery = null;
+            isChatWaiting = false;
+            showAppToast('ऑफलाइन स्विच रद्द किया गया।');
+        }
+
+        async function confirmOfflineSwitch() {
+            document.getElementById('offlineConfirmModal').classList.add('hidden');
+            if (!pendingOfflineQuery) {
+                isChatWaiting = false;
+                return;
+            }
+
+            const { promptText, hasPhoto } = pendingOfflineQuery;
+            pendingOfflineQuery = null;
+
+            const offlineText = synthesizeAgriAIResponse(promptText, hasPhoto);
+
+            const modelCardObj = createStreamingModelCard(true);
+            await streamAIResponse(offlineText, modelCardObj.contentEl, () => {
+                isChatWaiting = false;
+                chatConversationHistory.push({ role: 'user', text: promptText });
+                chatConversationHistory.push({ role: 'model', text: offlineText });
+                scrollChatToBottom();
+            });
+        }
+
+        // =========================================================================
+        // OFFLINE BACKUP SYNTHESIS (IN-BROWSER CONTEXT-AWARE)
+        // =========================================================================
+        function synthesizeAgriAIResponse(query, hasPhoto = false) {
+            const raw = (query || "").trim();
+            const q = raw.toLowerCase();
+
+            if (hasPhoto) {
+                return `### 📷 कृषि मित्र विज़न निदान (Leaf Visual Diagnostic)\n\nराम-राम किसान भाई! आपकी भेजी गई पौधे/पत्ती की फोटो का न्यूरल विज़न विश्लेषण:\n\n---\n\n#### 1. 🔍 प्राथमिक लक्षण एवं रोग पहचान:\n* पत्तियों पर अंतःशिरा क्लोरोसिस (Interveinal Chlorosis) और किनारों से पीलापन स्पष्ट है।\n* मुख्य नसें हरी हैं परंतु बीच का भाग पीला व मखमली भूरा हो रहा है, जो **जिंक/सल्फर की कमी** और शुरुआती **फफूंद/रसचूसक कीट** संक्रमण का मिलाजुला संकेत है।\n\n---\n\n#### 2. 🧪 15 लीटर स्प्रे पंप (टंकी) सटीक रासायनिक नाप:\n* **चिलेटेड जिंक (Zn EDTA 12%) 25 ग्राम** + **साफ फफूंदनाशक (कार्बेन्डाजिम 12% + मैन्कोजेब 63% WP) 35 ग्राम** प्रति 15 लीटर पानी में घोलें।\n* **स्टीकर:** 5 ml सिलिकॉन स्प्रेडर अवश्य मिलाएं।\n\n---\n\n#### 3. 🌿 देशी जैविक / प्राकृतिक उपचार:\n* 5 दिन पुरानी 500 ml तांबे की खट्टी छाछ + 2 ग्राम हींग 15 लीटर पानी में छानकर दोपहर के समय स्प्रे करें।`;
+            }
+
+            const cropMatches = [
+                { key: 'wheat', name: 'गेहूं (Wheat)', terms: ['गेहूं', 'wheat', 'शरबती', 'लोकवन', 'gw322', 'gw-322'] },
+                { key: 'chana', name: 'चना व डॉलर चना (Gram)', terms: ['चना', 'chana', 'डॉलर', 'gram', 'chickpea'] },
+                { key: 'mustard', name: 'सरसों व राई (Mustard)', terms: ['सरसों', 'sarson', 'mustard', 'राई', 'raya'] },
+                { key: 'garlic', name: 'लहसुन (Garlic)', terms: ['लहसुन', 'garlic', 'lahsun', 'रियावन', 'g-282'] },
+                { key: 'onion', name: 'प्याज (Onion)', terms: ['प्याज', 'onion', 'pyaj'] },
+                { key: 'potato', name: 'आलू (Potato)', terms: ['आलू', 'potato', 'aloo', 'चिपसोना'] },
+                { key: 'coriander', name: 'धनिया (Coriander)', terms: ['धनिया', 'coriander', 'dhaniya', 'कुंभराज'] },
+                { key: 'soybean', name: 'सोयाबीन (Soybean)', terms: ['सोयाबीन', 'soybean', 'सोया', 'js9560', 'js2034'] },
+                { key: 'cotton', name: 'कपास (Cotton)', terms: ['कपास', 'cotton', 'kapas', 'नरमा'] },
+                { key: 'maize', name: 'मक्का (Maize)', terms: ['मक्का', 'maize', 'corn', 'makka'] },
+                { key: 'paddy', name: 'धान (Paddy)', terms: ['धान', 'paddy', 'rice', 'चावल', 'चिन्नौर'] },
+                { key: 'chilli', name: 'मिर्च (Chilli)', terms: ['मिर्च', 'chilli', 'mirch'] },
+                { key: 'tomato', name: 'टमाटर (Tomato)', terms: ['टमाटर', 'tomato', 'tamatar'] },
+                { key: 'pea', name: 'मटर (Pea)', terms: ['मटर', 'matar', 'pea'] },
+                { key: 'masoor', name: 'मसूर (Lentil)', terms: ['मसूर', 'masoor', 'lentil'] },
+                { key: 'moong', name: 'मूंग (Moong)', terms: ['मूंग', 'moong', 'विराट'] }
+            ];
+
+            let activeCrop = cropMatches.find(c => c.terms.some(t => q.includes(t)));
+
+            if (!activeCrop && chatConversationHistory.length > 0) {
+                for (let i = chatConversationHistory.length - 1; i >= 0; i--) {
+                    const prevText = (chatConversationHistory[i].text || "").toLowerCase();
+                    const matched = cropMatches.find(c => c.terms.some(t => prevText.includes(t)));
+                    if (matched) {
+                        activeCrop = matched;
+                        break;
+                    }
+                }
+            }
+
+            const cropName = activeCrop ? activeCrop.name : 'आपकी फसल';
+            const cropKey = activeCrop ? activeCrop.key : 'general';
+
+            const lastTurnText = chatConversationHistory.length > 0 ? (chatConversationHistory[chatConversationHistory.length - 1].text || "").toLowerCase() : "";
+            const isFollowUpWhy = q.includes('कारण') || q.includes('क्यों') || q.includes('वजह') || q.includes('why') || q.includes('reason');
+
+            if (isFollowUpWhy && (lastTurnText.includes('खरपतवार') || q.includes('खरपतवार'))) {
+                return `### 🌾 कृषि मित्र: ${cropName} में खरपतवार उगने के मुख्य कारण\n\nराम-राम किसान भाई! पिछली बातचीत के संदर्भ में इसके मुख्य कारण निम्नलिखित हैं:\n\n1. **अपरिष्कृत (कच्चा) गोबर खाद:** गोबर की सड़ी खाद के बजाय कच्चा गोबर डालने से उसमें मौजूद घास के बीज खेत में तेजी से अंकुरित होते हैं।\n2. **पूर्व फसल के गिरे बीज:** पिछली फसल की कटाई के समय जो घास पककर झड़ गई थी, वे बीज पहली सिंचाई मिलते ही उग आते हैं।\n3. **कंबाइन हार्वेस्टर व हल:** बिना धुले यंत्रों द्वारा एक खेत से दूसरे खेत में खरपतवार के बीजों का प्रसार।\n4. **सिंचाई के पानी की नालियां:** मेड़ों व नालियों पर उगे बथुआ, गुल्ली डंडा आदि के बीज बहकर पूरे खेत में फैल जाते हैं।\n\n**रोकथाम:** पहली सिंचाई के तुरंत बाद तर ओट में अनुशंसित चयनात्मक खरपतवारनाशक का कट नोजल से फ्लैट-फैन स्प्रे करें।`;
+            }
+
+            const isWeed = q.includes('खरपतवार') || q.includes('घास') || q.includes('कचरा') || q.includes('weed') || q.includes('बथुआ') || q.includes('गुल्ली');
+            const isIrrigation = q.includes('सिंचाई') || q.includes('पानी') || q.includes('पहला पानी') || q.includes('दूसरा पानी') || q.includes('कब दें') || q.includes('cri');
+            const isTillers = q.includes('कल्ले') || q.includes('फुटाव') || q.includes('बढ़वार') || q.includes('ग्रोथ') || q.includes('टॉनिक');
+            const isYellow = q.includes('पीला') || q.includes('पीलापन') || q.includes('पीली') || q.includes('yellow');
+            const isIlli = q.includes('इल्ली') || q.includes('सुंडी') || q.includes('कीड़ा') || q.includes('छेदक') || q.includes('लट');
+            const isSuckingPest = q.includes('माहू') || q.includes('चेपा') || q.includes('थ्रिप्स') || q.includes('सफेद मक्खी');
+            const isBulking = q.includes('कंद') || q.includes('साइज') || q.includes('वजन') || q.includes('चमक') || q.includes('0:52:34') || q.includes('0:0:50');
+
+            if (isWeed) {
+                if (cropKey === 'wheat') {
+                    return `### 🌾 कृषि मित्र: ${cropName} में खरपतवार नियंत्रण\n\n**1. सकरी पत्ती (गुल्ली डंडा / जंगली जई):**\n* क्लोडिनाफॉप प्रोपर्जिल 15% WP: 16 ग्राम प्रति 15 लीटर टंकी (1 एकड़ में 160g दवा 8-10 टंकी पानी)।\n\n**2. चौड़ी पत्ती (बथुआ, सेंजी, चटरी-मटरी):**\n* मेटसल्फ्यूरॉन मिथाइल 20% WP (एल्ग्रिप): 2 ग्राम प्रति 15 लीटर पंप।\n\n**3. दोनों एक साथ हों:** सल्फोसल्फ्यूरॉन 75% + मेटसल्फ्यूरॉन 5% WDG (टोटल) 1.6 ग्राम प्रति 15L पंप।\n\n**सावधानी:** पहले पानी के 5-7 दिन बाद (तर ओट) में फ्लैट-फैन नोजल से ही स्प्रे करें।`;
+                }
+                return `### 🌿 कृषि मित्र: ${cropName} में खरपतवार नियंत्रण पैकेज\n\n* **सकरी पत्ती घास:** क्विजालोफॉप इथाइल 5% EC 25-30 ml प्रति 15 लीटर पंप छिड़कें।\n* **चौड़ी पत्ती खरपतवार:** फसल की अवस्था देखकर 20-25 दिन पर हल्की निराई-गुड़ाई करें।`;
+            }
+
+            if (isIrrigation) {
+                if (cropKey === 'wheat') {
+                    return `### 🌾 कृषि मित्र: ${cropName} में सिंचाई का वैज्ञानिक चक्र\n\n1. **पहला पानी (CRI - ताज जड़ अवस्था):** बुवाई के **20 से 22 दिन** पर। इसके साथ 45kg यूरिया दें।\n2. **दूसरा पानी (कल्ले फूटते समय):** 40-45 दिन पर + 35kg यूरिया।\n3. **तीसरा पानी:** 60-65 दिन पर।\n4. **चौथा पानी (फूल व बालियां निकलते समय):** 80-85 दिन पर।\n5. **पांचवां पानी (दूधिया अवस्था):** 100-105 दिन पर।`;
+                }
+                if (cropKey === 'chana') {
+                    return `### 🌱 कृषि मित्र: ${cropName} में पानी देने का नियम\n\n* **पहला पानी:** बुवाई के 40-45 दिन बाद (शाखाएं निकलते समय)।\n* **दूसरा पानी:** फलियों में दाना भरते समय (75-80 दिन)।\n* **सख्त नियम:** **फूल खिलने के समय पानी कभी न दें!** वरना फूल झड़ जाते हैं।`;
+                }
+                return `### 💧 कृषि मित्र: ${cropName} में सिंचाई प्रबंधन\n\n* ${cropName} में क्रांतिक अवस्थाओं (जड़ विकास, फूल आने से पूर्व और दाना भराव) पर हल्की सिंचाई करें।`;
+            }
+
+            if (isTillers) {
+                return `### 🌾 कृषि मित्र: ${cropName} में कल्ले व फुटाव बढ़ाने का फॉर्मूला\n\n* **जड़ क्षेत्र:** पहले पानी के साथ प्रति एकड़ 45 kg यूरिया + 5 kg जिंक सल्फेट (21%) दें।\n* **15 लीटर पंप स्प्रे (30-35 दिन):** NPK 19:19:19 (75 ग्राम) + ह्यूमिक एसिड 98% (25 ग्राम) प्रति 15 लीटर पानी में घोलकर स्प्रे करें।`;
+            }
+
+            if (isYellow) {
+                return `### 🍂 कृषि मित्र: ${cropName} में पत्तियों का पीलापन - 15L पंप इलाज\n\n* **जिंक की कमी:** चिलेटेड जिंक (Zn EDTA 12%) 25 ग्राम + यूरिया 100 ग्राम प्रति 15 लीटर पानी में घोलकर स्प्रे करें।\n* **फफूंद या जड़ रोग:** साफ (कार्बेन्डाजिम + मैन्कोजेब) 35 ग्राम प्रति 15L पंप दें।`;
+            }
+
+            if (isIlli) {
+                return `### 🐛 कृषि मित्र: ${cropName} में इल्ली का अचूक खात्मा\n\n* **छोटी इल्लियां:** एमामेक्टिन बेंजोएट 5% SG 10 ग्राम प्रति 15 लीटर टंकी।\n* **बड़ी इल्लियां (घाटी छेदक/आर्मीवर्म):** कोराजन (क्लोरेंट्रानिलिप्रोल) 6 ml प्रति 15 लीटर टंकी।\n* **जैविक:** ब्रह्मास्त्र 350 ml प्रति 15 लीटर पंप शाम को छिड़कें।`;
+            }
+
+            if (isSuckingPest) {
+                return `### 🪰 कृषि मित्र: ${cropName} में माहू व रसचूसक कीट नियंत्रण\n\n* **माहू/चेपा:** इमिडाक्लोप्रिड 17.8% SL 10 ml प्रति 15 लीटर टंकी।\n* **थ्रिप्स:** फिप्रोनिल 5% SC 30 ml प्रति 15L पंप।\n* **जैविक:** नीमास्त्र 500 ml प्रति 15 लीटर पानी।`;
+            }
+
+            if (isBulking) {
+                return `### ⚖️ कृषि मित्र: ${cropName} में कंद/फल का साइज व वजन बढ़ाने का फॉर्मूला\n\n* **फुलाव अवस्था (75-80 दिन):** NPK 0:52:34 (80 ग्राम) + 20% बोरॉन (20 ग्राम) प्रति 15 लीटर टंकी में मिलाकर स्प्रे करें।\n* **अंतिम चमक हेतु:** NPK 0:0:50 (100 ग्राम) प्रति पंप।`;
+            }
+
+            return `### 🌾 कृषि मित्र: ${cropName} वैज्ञानिक परामर्श\n\nराम-राम किसान भाई! आपके प्रश्न **"${raw}"** के संदर्भ में JNKVV जबलपुर एवं RVSKVV ग्वालियर की वैज्ञानिक अनुशंसा:\n\n* **समस्या विश्लेषण:** ${cropName} में यह स्थिति असंतुलित पोषण या मौसम परिवर्तन का परिणाम हो सकती है।\n* **15 लीटर पंप स्प्रे:** NPK 19:19:19 (75g) + साफ फफूंदनाशक (35g) 15 लीटर पानी में घोलकर दोपहर बाद स्प्रे करें।\n* **जैविक उपाय:** 200 लीटर ताजा जीवामृत सिंचाई के साथ दें।`;
+        }
+
+        async function streamAIResponse(fullText, containerEl, onComplete) {
+            containerEl.innerHTML = '';
+            const tokens = fullText.split(/(\s+)/);
+            let currentText = '';
+            
+            for (let i = 0; i < tokens.length; i++) {
+                currentText += tokens[i];
+                containerEl.innerHTML = marked.parse(currentText) + '<span class="cursor-blink"></span>';
+                scrollChatToBottom();
+                
+                const delay = (tokens[i].includes('\n') || tokens[i].includes('.')) ? 30 : 12;
+                await new Promise(r => setTimeout(r, delay));
+            }
+            
+            containerEl.innerHTML = marked.parse(currentText);
+            scrollChatToBottom();
+            if (onComplete) onComplete();
+        }
+
+        const chatPromptChips = {
+            hi: [
+                { title: '🚫 गेहूं: खरपतवार नियंत्रण', prompt: 'गेहूं में सकरी व चौड़ी पत्ती के खरपतवार (कचरा) को मारने के लिए कौन सी दवा 15L पंप में डालें?' },
+                { title: '💧 गेहूं: पहला पानी कब दें?', prompt: 'गेहूं में पहला पानी कितने दिन पर और किस अवस्था में देना चाहिए?' },
+                { title: '🌾 गेहूं में कल्ले कैसे बढ़ाएं?', prompt: 'गेहूं में कल्ले और फुटाव बढ़ाने के लिए क्या करें और कौन सा टॉनिक डालें?' },
+                { title: '🍂 पत्तियों में पीलापन का इलाज', prompt: 'फसल की पत्तियों में पीलापन आ रहा है, इसका सही कारण और 15L पंप का स्प्रे बताएं।' },
+                { title: '🐛 चने की घाटी छेदक इल्ली', prompt: 'चने में घाटी छेदक इल्ली का रासायनिक और जैविक इलाज 15L पंप डोज के साथ बताएं।' },
+                { title: '🧄 लहसुन में कंद फुलाव व वजन', prompt: 'लहसुन में कंद का साइज, वजन और पर्दा मजबूत करने के लिए 80 दिन पर क्या स्प्रे करें?' },
+                { title: '🌿 जीवामृत बनाने की विधि', prompt: 'जीवामृत बनाने की सही विधि क्या है और एक एकड़ में इसे सिंचाई के पानी के साथ कैसे दें?' }
+            ],
+            en: [
+                { title: '🚫 Wheat Weed Control', prompt: 'What weedicide should be used in wheat for broad and narrow leaf weeds with 15L pump dose?' },
+                { title: '💧 Wheat: 1st Irrigation Timing', prompt: 'When should the first irrigation be given in wheat and at what stage?' },
+                { title: '🌾 How to increase Tillers in Wheat?', prompt: 'How to increase tillering and growth in wheat crop?' }
+            ]
+        };
+
+        const mpCropsDatabase = [
+            { id: 'wheat', season: 'rabi', nameHi: 'गेहूं (Wheat - शरबती/लोकवन/GW322)', icon: 'fa-wheat-awn', mpRegionsHi: 'सीहोर, विदिशा, होशंगाबाद, मालवा, चंबल', sowingMonthHi: '15 अक्टूबर - 25 नवंबर', seedRateHi: '40 - 45 kg प्रति एकड़', sowingFertilizerHi: '3 बोरी SSP (150kg) + 25kg पोटाश (MOP) + 30kg यूरिया + 5kg जिंक सल्फेट बीज के 2 इंच नीचे।' },
+            { id: 'chana', season: 'rabi', nameHi: 'चना व डॉलर चना (Gram / Dollar Chana)', icon: 'fa-circle-dot', mpRegionsHi: 'उज्जैन, देवास, सागर, दमोह, नरसिंहपुर, राजगढ़', sowingMonthHi: '15 अक्टूबर - 15 नवंबर', seedRateHi: '30 - 35 kg (देसी) / 45 kg (डॉलर)', sowingFertilizerHi: '2.5 बोरी SSP (125kg) + 20kg पोटाश + 15kg स्टार्टर यूरिया। खड़ी फसल में यूरिया कभी न डालें!' },
+            { id: 'mustard', season: 'rabi', nameHi: 'सरसों व राई (Mustard - RH 749/गिरिराज)', icon: 'fa-sun', mpRegionsHi: 'मुरैना, भिंड, ग्वालियर, श्योपुर (चंबल संभाग)', sowingMonthHi: '25 सितंबर - 20 अक्टूबर', seedRateHi: '1.5 - 2 kg प्रति एकड़', sowingFertilizerHi: '3 बोरी SSP (150kg) + 35kg यूरिया + 15kg पोटाश। तेल व दाने के लिए SSP सर्वोत्तम है।' },
+            { id: 'garlic', season: 'rabi', nameHi: 'लहसुन (Garlic - G-282/रियावन/अमलेटा)', icon: 'fa-fan', mpRegionsHi: 'मंदसौर, नीमच, रतलाम, जावरा', sowingMonthHi: '15 सितंबर - 31 अक्टूबर', seedRateHi: '180 - 200 kg कलियां प्रति एकड़', sowingFertilizerHi: '1 बोरी DAP + 2 बोरी SSP + 40kg पोटाश + 30kg यूरिया + 15kg बेंटोनाइट सल्फर।' },
+            { id: 'onion', season: 'rabi', nameHi: 'प्याज (Rabi Onion - एलोरा/भीमा सुपर)', icon: 'fa-circle', mpRegionsHi: 'खंडवा, खरगोन, देवास, शाजापुर, इंदौर', sowingMonthHi: 'रोपाई: दिसंबर - जनवरी', seedRateHi: '3.5 - 4 kg बीज प्रति एकड़ (नर्सरी)', sowingFertilizerHi: '1 बोरी DAP + 25kg MOP पोटाश + 30kg यूरिया + 10kg सल्फर रोपाई के समय।' },
+            { id: 'potato', season: 'rabi', nameHi: 'आलू (Potato - कुफरी चिपसोना/ज्योति)', icon: 'fa-cookie', mpRegionsHi: 'इंदौर, उज्जैन, छिंदवाड़ा, देवास', sowingMonthHi: '15 अक्टूबर - 5 नवंबर', seedRateHi: '10 - 12 क्विंटल कंद प्रति एकड़', sowingFertilizerHi: '2 बोरी DAP (100kg) + 40kg MOP पोटाश + 45kg यूरिया बुवाई पर कतारों में दें।' },
+            { id: 'coriander', season: 'rabi', nameHi: 'धनिया (Coriander - कुंभराज/पंत हरितमा)', icon: 'fa-leaf', mpRegionsHi: 'गुना (कुंभराज मंडी), नीमच, मंदसौर, राजगढ़', sowingMonthHi: '15 अक्टूबर - 10 नवंबर', seedRateHi: '8 - 10 kg दाल (बीज) प्रति एकड़', sowingFertilizerHi: '2 बोरी SSP (100kg) + 20kg DAP + 15kg पोटाश + 20kg यूरिया बुवाई के समय।' },
+            { id: 'masoor', season: 'rabi', nameHi: 'मसूर (Lentil - जेएल-3/पूसा अगेती)', icon: 'fa-stroopwafel', mpRegionsHi: 'सागर, दमोह, विदिशा, नरसिंहपुर, रायसेन', sowingMonthHi: '20 अक्टूबर - 15 नवंबर', seedRateHi: '18 - 20 kg प्रति एकड़', sowingFertilizerHi: '2 बोरी SSP (100kg) + 15kg DAP + 15kg पोटाश।' },
+            { id: 'pea', season: 'rabi', nameHi: 'मटर (Field Pea / Green Pea - GS-10/आजाद)', icon: 'fa-circle-notch', mpRegionsHi: 'जबलपुर, छिंदवाड़ा, इंदौर, रायसेन', sowingMonthHi: '15 अक्टूबर - 10 नवंबर', seedRateHi: '35 - 40 kg प्रति एकड़', sowingFertilizerHi: '1 बोरी DAP (50kg) + 20kg पोटाश + 50kg SSP।' },
+            { id: 'soybean', season: 'kharif', nameHi: 'सोयाबीन (Soybean - JS 9560/2034/NRC 127)', icon: 'fa-seedling', mpRegionsHi: 'धार, इंदौर, उज्जैन, शाजापुर, सीहोर, देवास', sowingMonthHi: 'मानसून की पहली बारिश (15 जून - 5 जुलाई)', seedRateHi: '30 - 32 kg प्रति एकड़', sowingFertilizerHi: '3 बोरी SSP (150kg) + 25kg पोटाश (MOP) + 15kg स्टार्टर यूरिया।' }
+        ];
+
+        const mpDiseaseClinic = [
+            { crop: 'सोयाबीन', disease: 'पीला मोज़ेक वायरस (Yellow Mosaic Virus)', symptoms: 'पत्तियों पर पीले-हरे धब्बे, पत्तियों का सिकुड़ना व फलियों में दाना न बनना। सफेद मक्खी द्वारा फैलता है।', remedy15L: 'थियामेथोक्सम 12.6% + लैम्ब्डा-साइहालोथ्रिन 9.5% ZC (अलीका) 8 ml प्रति 15 लीटर पंप।', organic: 'नीमास्त्र का 10% छिड़काव अथवा नीम तेल (10,000 PPM) 35 ml प्रति 15 लीटर पानी।' },
+            { crop: 'सोयाबीन', disease: 'गर्डल बीटल व सेमीलूपर इल्ली (Girdle Beetle)', symptoms: 'तने पर रिंग कट जाना, पत्तियां छलनी होना और शाखाओं का सूखकर लटक जाना।', remedy15L: 'कोराजन (क्लोरेंट्रानिलिप्रोल 18.5% SC) 6 ml प्रति 15 लीटर टंकी।', organic: 'ब्रह्मास्त्र 350 ml प्रति 15 लीटर पंप।' },
+            { crop: 'गेहूं', disease: 'पीला व भूरा रतुआ (Yellow / Brown Rust)', symptoms: 'पत्तियों पर हल्दी जैसा पीला या भूरा पाउडर दिखना, हाथ लगाने पर उंगलियों पर रंग चढ़ना।', remedy15L: 'प्रोपिकोनाजोल 25% EC (टिल्ट) 20 ml प्रति 15 लीटर पानी।', organic: 'खट्टी छाछ (500 ml) तांबे के बर्तन में रखी + 2 ग्राम हींग 15 लीटर पानी में।' },
+            { crop: 'चना', disease: 'उकठा रोग (Fusarium Wilt)', symptoms: 'खड़ी फसल में पौधों का अचानक मुरझाना और सूखना। जड़ चीरने पर अंदर काली धारी।', remedy15L: 'कार्बेन्डाजिम + मैन्कोजेब (साफ) 35 ग्राम प्रति 15 लीटर टंकी ड्रेंचिंग करें।', organic: 'बीजामृत अथवा ट्राइकोडर्मा विरिडी से बीज उपचार।' },
+            { crop: 'चना', disease: 'घाटी छेदक इल्ली (Pod Borer)', symptoms: 'फूलों व फलियों में गोल छेद करके दाना खा जाना।', remedy15L: 'एमामेक्टिन बेंजोएट 5% SG 10 ग्राम प्रति 15 लीटर टंकी।', organic: 'ब्रह्मास्त्र (350 ml) प्रति 15L टंकी।' },
+            { crop: 'सरसों', disease: 'माहू / चेपा (Mustard Aphid)', symptoms: 'फूलों व फलियों पर काले-हरे रसचूसक कीड़ों का चिपचिपा झुंड।', remedy15L: 'इमिडाक्लोप्रिड 17.8% SL 10 ml प्रति 15 लीटर टंकी।', organic: 'नीमास्त्र 500 ml प्रति 15 लीटर पानी।' },
+            { crop: 'लहसुन', disease: 'थ्रिप्स व जलेबी रोग (Thrips & Twister)', symptoms: 'पत्तियों के सिरे सूखना, पत्तियों का मुड़ना और सफेद-चांदी जैसी धारियां।', remedy15L: 'फिप्रोनिल 5% SC 30 ml + साफ फफूंदनाशक 35 ग्राम प्रति 15 लीटर टंकी।', organic: 'नीमास्त्र 400 ml प्रति 15 लीटर टंकी।' }
+        ];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderCropsCatalog(mpCropsDatabase);
+            renderChatChips();
+            renderDiseaseClinic();
+            calculateMPFertilizerDose();
+            calculateJeevamritDose();
+        });
+
+        function switchTab(tabId) {
+            currentActiveTab = tabId;
+            document.getElementById('tabViewChat').classList.add('hidden');
+            document.getElementById('tabViewCrops').classList.add('hidden');
+            document.getElementById('tabViewOrganic').classList.add('hidden');
+            document.getElementById('tabViewCalc').classList.add('hidden');
+            document.getElementById('tabViewDoctor').classList.add('hidden');
+
+            const target = {
+                chat: 'tabViewChat',
+                crops: 'tabViewCrops',
+                organic: 'tabViewOrganic',
+                calc: 'tabViewCalc',
+                doctor: 'tabViewDoctor'
+            }[tabId];
+
+            if (target) document.getElementById(target).classList.remove('hidden');
+
+            const tabs = ['Chat', 'Crops', 'Organic', 'Calc', 'Doctor'];
+            tabs.forEach(t => {
+                const dBtn = document.getElementById(`navTab${t}`);
+                if (dBtn) {
+                    if (t.toLowerCase() === tabId) {
+                        dBtn.className = "px-3 py-1.5 rounded-lg transition flex items-center space-x-1.5 bg-white text-kisan-900 shadow";
+                    } else {
+                        dBtn.className = "px-3 py-1.5 rounded-lg transition flex items-center space-x-1.5 text-white/80 hover:text-white hover:bg-white/10";
+                    }
+                }
+                const mBtn = document.getElementById(`mTab${t}`);
+                if (mBtn) {
+                    if (t.toLowerCase() === tabId) {
+                        mBtn.className = "flex-1 py-2 px-2 text-center text-mpGold border-b-2 border-mpGold flex items-center justify-center space-x-1 whitespace-nowrap";
+                    } else {
+                        mBtn.className = "flex-1 py-2 px-2 text-center text-white/70 border-b-2 border-transparent flex items-center justify-center space-x-1 whitespace-nowrap";
+                    }
+                }
+            });
+
+            if (tabId === 'chat') scrollChatToBottom();
+        }
+
+        function calculateJeevamritDose() {
+            const area = parseFloat(document.getElementById('organicAreaInput').value) || 1;
+            const unit = document.getElementById('organicUnitSelect').value;
+            const acres = unit === 'bigha' ? area * 0.625 : area;
+
+            document.getElementById('orgDung').innerText = `${Math.round(10 * acres)} kg`;
+            document.getElementById('orgUrine').innerText = `${Math.round(10 * acres)} लीटर`;
+            document.getElementById('orgJaggery').innerText = `${(2 * acres).toFixed(1).replace('.0', '')} kg`;
+            document.getElementById('orgFlour').innerText = `${(2 * acres).toFixed(1).replace('.0', '')} kg`;
+            document.getElementById('orgWater').innerText = `सजीव मिट्टी + ${Math.round(200 * acres)}L`;
+        }
+
+        function askAIAboutOrganic(question) {
+            switchTab('chat');
+            const input = document.getElementById('chatTextInput');
+            input.value = question;
+            handleChatSubmit(new Event('submit'));
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const hiBtn = document.getElementById('langBtnHi');
+            const enBtn = document.getElementById('langBtnEn');
+
+            if (lang === 'hi') {
+                hiBtn.className = "px-2 py-0.5 rounded-lg bg-mpGold text-kisan-950 font-extrabold shadow-sm transition";
+                enBtn.className = "px-2 py-0.5 rounded-lg text-white hover:text-mpGold transition";
+            } else {
+                enBtn.className = "px-2 py-0.5 rounded-lg bg-mpGold text-kisan-950 font-extrabold shadow-sm transition";
+                hiBtn.className = "px-2 py-0.5 rounded-lg text-white hover:text-mpGold transition";
+            }
+
+            renderChatChips();
+            showAppToast(lang === 'hi' ? 'भाषा: हिंदी चुनी गई' : 'Language set to English');
+        }
+
+        function renderChatChips() {
+            const container = document.getElementById('chatChipsContainer');
+            const chips = chatPromptChips[currentLang] || chatPromptChips.hi;
+            container.innerHTML = '';
+
+            chips.forEach(chip => {
+                const btn = document.createElement('button');
+                btn.className = "inline-flex items-center space-x-1.5 whitespace-nowrap bg-white hover:bg-kisan-100 border border-kisan-200 text-kisan-950 text-xs font-bold px-3 py-1.5 rounded-full shadow-xs transition active:scale-95 shrink-0";
+                btn.innerHTML = `<span>${chip.title}</span>`;
+                btn.onclick = () => {
+                    const input = document.getElementById('chatTextInput');
+                    input.value = chip.prompt;
+                    handleChatSubmit(new Event('submit'));
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        async function toggleSpeechRecording() {
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRec) {
+                showAppToast('ब्राउज़र में वॉयस इनपुट समर्थित नहीं है।');
+                return;
+            }
+
+            if (isMicRecording) {
+                stopSpeechRecording();
+                return;
+            }
+
+            try {
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    stream.getTracks().forEach(track => track.stop());
+                }
+            } catch (err) {
+                showAppToast('⚠️ कृपया माइक्रोफोन अनुमति दें');
+                return;
+            }
+
+            startSpeechRecognition();
+        }
+
+        function startSpeechRecognition() {
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRec) return;
+
+            if (speechRecognitionInstance) {
+                try { speechRecognitionInstance.abort(); } catch(e) {}
+                speechRecognitionInstance = null;
+            }
+
+            speechRecognitionInstance = new SpeechRec();
+            speechRecognitionInstance.continuous = false;
+            speechRecognitionInstance.interimResults = false;
+            speechRecognitionInstance.lang = currentLang === 'hi' ? 'hi-IN' : 'en-IN';
+
+            speechRecognitionInstance.onstart = () => {
+                isMicRecording = true;
+                const micBtn = document.getElementById('micRecordBtn');
+                if (micBtn) micBtn.classList.add('voice-active');
+                const banner = document.getElementById('voiceListeningBanner');
+                if (banner) banner.classList.remove('hidden');
+                showAppToast('🎙️ अब बोलिए, हम सुन रहे हैं...');
+            };
+
+            speechRecognitionInstance.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                const input = document.getElementById('chatTextInput');
+                if (input) input.value = transcript;
+                stopSpeechRecording();
+                setTimeout(() => {
+                    handleChatSubmit(new Event('submit'));
+                }, 300);
+            };
+
+            speechRecognitionInstance.onerror = () => { stopSpeechRecording(); };
+            speechRecognitionInstance.onend = () => { stopSpeechRecording(); };
+
+            try { speechRecognitionInstance.start(); } catch (err) { stopSpeechRecording(); }
+        }
+
+        function stopSpeechRecording() {
+            isMicRecording = false;
+            const micBtn = document.getElementById('micRecordBtn');
+            if (micBtn) micBtn.classList.remove('voice-active');
+            const banner = document.getElementById('voiceListeningBanner');
+            if (banner) banner.classList.add('hidden');
+            if (speechRecognitionInstance) {
+                try { speechRecognitionInstance.stop(); } catch(e) {}
+            }
+        }
+
+        function speakMessageText(text, btnEl) {
+            if (!('speechSynthesis' in window)) {
+                showAppToast('Text-to-speech not supported');
+                return;
+            }
+
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+                if (activeUtteranceSpeaker) {
+                    activeUtteranceSpeaker.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+                }
+                activeUtteranceSpeaker = null;
+                return;
+            }
+
+            const cleanText = text
+                .replace(/(\*\*|__)(.*?)\1/g, '$2')
+                .replace(/(\*|_)(.*?)\1/g, '$2')
+                .replace(/#+/g, '')
+                .replace(/`{1,3}.*?`{1,3}/g, '')
+                .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+                .replace(/\|/g, ' ')
+                .replace(/-{3,}/g, ' ')
+                .trim();
+
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = currentLang === 'hi' ? 'hi-IN' : 'en-IN';
+            utterance.rate = 0.95;
+
+            btnEl.innerHTML = '<i class="fa-solid fa-stop text-red-600 animate-pulse"></i>';
+            activeUtteranceSpeaker = btnEl;
+
+            utterance.onend = () => {
+                btnEl.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+                activeUtteranceSpeaker = null;
+            };
+
+            utterance.onerror = () => {
+                btnEl.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+                activeUtteranceSpeaker = null;
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function onCropImageSelected(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                selectedCropPhotoBase64 = e.target.result.split(',')[1];
+                document.getElementById('attachedThumbnail').src = e.target.result;
+                document.getElementById('imagePreviewCard').classList.remove('hidden');
+                showAppToast('पौधे की फोटो जोड़ी गई!');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeAttachedImage() {
+            selectedCropPhotoBase64 = null;
+            document.getElementById('cameraFileInput').value = '';
+            document.getElementById('imagePreviewCard').classList.add('hidden');
+        }
+
+        async function handleChatSubmit(e) {
+            if (e) e.preventDefault();
+            if (isChatWaiting) return;
+
+            const input = document.getElementById('chatTextInput');
+            const query = input.value.trim();
+            const hasPhoto = !!selectedCropPhotoBase64;
+
+            if (!query && !hasPhoto) {
+                showAppToast('कृपया अपना सवाल लिखें या बोलें');
+                return;
+            }
+
+            const promptText = query || "कृपया इस पौधे/पत्ती की फोटो देखकर रोग या पोषक तत्व की कमी पहचानें और 15 लीटर टंकी के अनुसार दवा बताएं।";
+            const currentImg = selectedCropPhotoBase64;
+
+            input.value = '';
+            removeAttachedImage();
+
+            appendChatMessage({
+                role: 'user',
+                text: promptText,
+                image: currentImg ? `data:image/jpeg;base64,${currentImg}` : null
+            });
+
+            document.getElementById('chatThinkingIndicator').classList.remove('hidden');
+            scrollChatToBottom();
+            isChatWaiting = true;
+
+            try {
+                const liveResponse = await queryLiveGeminiAI(promptText, currentImg);
+                
+                document.getElementById('chatThinkingIndicator').classList.add('hidden');
+                
+                const modelCardObj = createStreamingModelCard(false);
+                await streamAIResponse(liveResponse, modelCardObj.contentEl, () => {
+                    isChatWaiting = false;
+                    chatConversationHistory.push({ role: 'user', text: promptText });
+                    chatConversationHistory.push({ role: 'model', text: liveResponse });
+                    scrollChatToBottom();
+                });
+
+            } catch (liveError) {
+                console.warn("Live Server unreachable:", liveError);
+                document.getElementById('chatThinkingIndicator').classList.add('hidden');
+                showOfflineConfirmModal(promptText, hasPhoto);
+            }
+        }
+
+        function createStreamingModelCard(isOffline = false) {
+            const list = document.getElementById('chatMessagesList');
+            const card = document.createElement('div');
+            card.className = "flex items-start space-x-2.5";
+
+            const modelBadge = isOffline 
+                ? `<span class="bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full text-[10px] font-bold border border-amber-300 flex items-center space-x-1 shadow-xs">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
+                    <span>ऑफलाइन AI (सावधानी बरतें)</span>
+                   </span>`
+                : `<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full text-[10px] font-bold border border-emerald-300 flex items-center space-x-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                    <span>⚡ कृषि मित्र Live AI</span>
+                   </span>`;
+
+            card.innerHTML = `
+                <div class="w-8 h-8 rounded-full ${isOffline ? 'bg-amber-800' : 'bg-kisan-800'} text-mpGold flex items-center justify-center text-xs shrink-0 shadow">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="bg-white border ${isOffline ? 'border-amber-300' : 'border-kisan-200'} rounded-2xl rounded-tl-sm p-4 max-w-[92%] sm:max-w-2xl text-sm shadow-sm space-y-3">
+                    <div class="prose-kisan text-slate-800 stream-target">
+                        <span class="cursor-blink"></span>
+                    </div>
+                    <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                        <div class="flex items-center space-x-1.5">
+                            ${modelBadge}
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="speakMessageText(this.closest('.bg-white').querySelector('.prose-kisan').innerText, this)" class="text-slate-500 hover:text-kisan-800 p-1.5 rounded-lg hover:bg-slate-100 transition" title="बोलकर सुनें">
+                                <i class="fa-solid fa-volume-high"></i>
+                            </button>
+                            <button onclick="copyTextClipboard(this.closest('.bg-white').querySelector('.prose-kisan').innerText)" class="text-slate-500 hover:text-kisan-800 p-1.5 rounded-lg hover:bg-slate-100 transition" title="कॉपी करें">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            list.appendChild(card);
+            return {
+                cardEl: card,
+                contentEl: card.querySelector('.stream-target')
+            };
+        }
+
+        function appendChatMessage(msg) {
+            const list = document.getElementById('chatMessagesList');
+            const card = document.createElement('div');
+
+            if (msg.role === 'user') {
+                card.className = "flex items-start justify-end space-x-2.5";
+                card.innerHTML = `
+                    <div class="bg-gradient-to-r from-kisan-700 to-kisan-800 text-white rounded-2xl rounded-tr-sm p-3.5 max-w-[85%] sm:max-w-xl text-sm shadow-sm space-y-2">
+                        ${msg.image ? `<img src="${msg.image}" class="max-h-48 rounded-xl object-cover border border-white/20 mb-2">` : ''}
+                        <p class="whitespace-pre-wrap leading-relaxed">${escapeHtml(msg.text)}</p>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs shrink-0 shadow">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                `;
+            }
+
+            list.appendChild(card);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function copyTextClipboard(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showAppToast('सलाह कॉपी कर ली गई!');
+        }
+
+        function scrollChatToBottom() {
+            const c = document.getElementById('chatMessagesScroll');
+            if (c) c.scrollTop = c.scrollHeight;
+        }
+
+        function onChatKeydown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleChatSubmit(e);
+            }
+        }
+
+        let currentCropSeasonFilter = 'all';
+
+        function filterCropsBySeason(season) {
+            currentCropSeasonFilter = season;
+            const filterBtns = ['All', 'Kharif', 'Rabi', 'Zaid'];
+            filterBtns.forEach(btn => {
+                const el = document.getElementById(`btnCrop${btn}`);
+                if (el) {
+                    if (btn.toLowerCase() === season) {
+                        el.className = "px-3.5 py-1.5 rounded-lg bg-kisan-800 text-white shadow transition";
+                    } else {
+                        el.className = "px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-kisan-800 transition";
+                    }
+                }
+            });
+
+            const filtered = season === 'all' 
+                ? mpCropsDatabase 
+                : mpCropsDatabase.filter(c => c.season === season);
+
+            renderCropsCatalog(filtered);
+        }
+
+        function renderCropsCatalog(crops) {
+            const container = document.getElementById('cropsCatalogGrid');
+            if (!container) return;
+            container.innerHTML = '';
+
+            crops.forEach(crop => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl border border-slate-200/90 p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between";
+
+                let seasonBadgeClass = crop.season === 'kharif' ? "bg-emerald-100 text-emerald-900 border-emerald-200" : "bg-blue-100 text-blue-900 border-blue-200";
+                let seasonBadgeText = crop.season === 'kharif' ? '🌧️ खरीफ (Kharif)' : '❄️ रबी (Rabi)';
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${seasonBadgeClass}">
+                                ${seasonBadgeText}
+                            </span>
+                            <span class="w-8 h-8 rounded-xl bg-slate-100 text-kisan-800 flex items-center justify-center text-sm shadow-inner">
+                                <i class="fa-solid ${crop.icon}"></i>
+                            </span>
+                        </div>
+
+                        <h4 class="font-extrabold text-slate-900 text-base mb-1.5">${crop.nameHi}</h4>
+
+                        <p class="text-[11px] text-slate-500 mb-2 font-medium">
+                            <i class="fa-solid fa-location-dot text-rose-500 mr-1"></i>
+                            <strong>म.प्र. क्षेत्र:</strong> ${crop.mpRegionsHi}
+                        </p>
+
+                        <div class="space-y-1.5 text-xs text-slate-700">
+                            <div><strong class="text-slate-800">बुवाई समय:</strong> ${crop.sowingMonthHi}</div>
+                            <div><strong class="text-slate-800">बीज दर:</strong> ${crop.seedRateHi}</div>
+
+                            <div class="bg-gradient-to-br from-kisan-50 to-amber-50/50 p-2.5 rounded-xl border border-kisan-200 mt-2">
+                                <div class="flex items-center space-x-1 text-kisan-900 font-extrabold text-[11px] mb-1">
+                                    <i class="fa-solid fa-flask text-kisan-800"></i>
+                                    <span>बुवाई पर सबसे उत्तम खाद:</span>
+                                </div>
+                                <p class="text-[11px] text-slate-800 leading-relaxed font-semibold">
+                                    ${crop.sowingFertilizerHi}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                        <button onclick="askAIAboutCrop('${crop.id}')" class="text-xs font-bold text-kisan-800 hover:text-kisan-950 flex items-center space-x-1 bg-kisan-100/70 hover:bg-kisan-200/80 px-2.5 py-1.5 rounded-lg transition">
+                            <i class="fa-solid fa-robot text-kisan-700"></i>
+                            <span>AI से पूछें</span>
+                        </button>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function askAIAboutCrop(cropId) {
+            const crop = mpCropsDatabase.find(c => c.id === cropId);
+            if (!crop) return;
+            switchTab('chat');
+            const input = document.getElementById('chatTextInput');
+            input.value = `मध्य प्रदेश के लिए ${crop.nameHi} की बुवाई के समय सबसे उत्तम खाद, बीज शोधन और रोग नियंत्रण की संपूर्ण वैज्ञानिक व जैविक सलाह दें।`;
+            handleChatSubmit(new Event('submit'));
+        }
+
+        function filterDoctorByCrop(cropName) {
+            const btns = document.querySelectorAll('.doc-filter-btn');
+            btns.forEach(btn => {
+                if (btn.innerText.includes(cropName) || (cropName === 'all' && btn.innerText.includes('सभी'))) {
+                    btn.className = "doc-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-rose-700 text-white shadow";
+                } else {
+                    btn.className = "doc-filter-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-rose-50";
+                }
+            });
+
+            if (cropName === 'all') {
+                renderDiseaseClinic(mpDiseaseClinic);
+            } else {
+                const filtered = mpDiseaseClinic.filter(d => d.crop.includes(cropName));
+                renderDiseaseClinic(filtered);
+            }
+        }
+
+        function renderDiseaseClinic(data = mpDiseaseClinic) {
+            const grid = document.getElementById('pestDoctorGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl border border-slate-200 p-4 shadow-sm hover:shadow-md transition space-y-2.5 flex flex-col justify-between";
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                            <span class="bg-rose-100 text-rose-900 text-xs font-bold px-2.5 py-0.5 rounded-full">${item.crop}</span>
+                            <span class="text-xs font-extrabold text-slate-800">${item.disease}</span>
+                        </div>
+
+                        <div class="text-xs space-y-1.5 text-slate-700 mt-2">
+                            <p><strong>लक्षण:</strong> ${item.symptoms}</p>
+                            
+                            <div class="bg-rose-50/80 p-2.5 rounded-xl border border-rose-200">
+                                <strong class="text-rose-900 block mb-0.5">
+                                    <i class="fa-solid fa-spray-can text-rose-600 mr-1"></i>
+                                    15 लीटर स्प्रे पंप दवा डोज:
+                                </strong>
+                                <span class="leading-relaxed font-medium">${item.remedy15L}</span>
+                            </div>
+
+                            <div class="bg-emerald-50/80 p-2 rounded-xl border border-emerald-200 text-emerald-950">
+                                <strong class="text-emerald-900 block mb-0.5">
+                                    <i class="fa-solid fa-leaf text-emerald-600 mr-1"></i>
+                                    जैविक व प्राकृतिक उपचार:
+                                </strong>
+                                <span>${item.organic}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 flex justify-end">
+                        <button onclick="askAIDisease('${item.crop}', '${item.disease}')" class="text-xs font-bold text-kisan-800 hover:text-kisan-950 flex items-center space-x-1 bg-kisan-50 hover:bg-kisan-100 px-3 py-1.5 rounded-lg border border-kisan-200 transition">
+                            <i class="fa-solid fa-robot text-kisan-700"></i>
+                            <span>AI डॉक्टर से पूछें</span>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function askAIDisease(crop, disease) {
+            switchTab('chat');
+            const input = document.getElementById('chatTextInput');
+            input.value = `${crop} में ${disease} के लक्षण दिखे हैं। 15 लीटर टंकी के अनुसार सबसे असरदार रासायनिक व जैविक दवा और सावधानियां बताएं।`;
+            handleChatSubmit(new Event('submit'));
+        }
+
+        const mpFertilizerFormulas = {
+            wheat: { nameHi: 'गेहूं - शरबती/लोकवन/GW322', ureaKg: 90, dapKg: 50, mopKg: 25, sspKg: 150, splitsHi: ["बुवाई पर: 3 बोरी SSP (150kg) + 25kg MOP (पोटाश) + 25kg यूरिया + 5kg जिंक सल्फेट बीज से 2 इंच नीचे।", "पहली सिंचाई (21 दिन - CRI अवस्था): 40-45 kg यूरिया प्रति एकड़।", "दूसरी सिंचाई (45 दिन - कल्ले फूटते समय): 35-40 kg यूरिया प्रति एकड़।"] },
+            chana: { nameHi: 'चना व डॉलर चना (Gram)', ureaKg: 15, dapKg: 45, mopKg: 20, sspKg: 125, splitsHi: ["बुवाई पर: 2.5 बोरी SSP (125kg) + 20kg MOP (पोटाश) + 15kg स्टार्टर यूरिया।", "सख्त नियम: खड़ी फसल में यूरिया कभी न डालें! इससे फूल झड़ते हैं और उकठा रोग बढ़ता है।"] },
+            mustard: { nameHi: 'सरसों (Mustard - चंबल)', ureaKg: 75, dapKg: 35, mopKg: 15, sspKg: 150, splitsHi: ["बुवाई पर: 3 बोरी SSP (150kg) + 35kg यूरिया + 15kg MOP पोटाश।", "पहली सिंचाई: 35-40 kg यूरिया प्रति एकड़ टॉप-ड्रेसिंग करें।"] },
+            garlic: { nameHi: 'लहसुन (Garlic - मंदसौर/नीमच)', ureaKg: 100, dapKg: 50, mopKg: 50, sspKg: 100, splitsHi: ["बुवाई पर: 1 बोरी DAP + 2 बोरी SSP + 40kg MOP + 30kg यूरिया + 15kg सल्फर।", "कंद फुलाव (75-80 दिन): NPK 0:0:50 (पोटाश 100g) + 20% बोरॉन (20g) प्रति 15L पंप स्प्रे करें।"] },
+            soybean: { nameHi: 'सोयाबीन (Soybean - मालवा)', ureaKg: 15, dapKg: 40, mopKg: 25, sspKg: 150, splitsHi: ["बुवाई पर: 3 बोरी SSP (150kg) + 25kg MOP (पोटाश) + 15kg स्टार्टर यूरिया।", "DAP की जगह SSP देने से 11% सल्फर मुफ्त मिलता है, जिससे दाने में तेल व चमक बढ़ती है।"] }
+        };
+
+        function calculateMPFertilizerDose() {
+            const cropKey = document.getElementById('calcCropSelect').value;
+            const areaVal = parseFloat(document.getElementById('calcAreaInput').value) || 1;
+            const unit = document.getElementById('calcUnitSelect').value;
+            let acres = unit === 'bigha' ? areaVal * 0.625 : areaVal;
+
+            const formula = mpFertilizerFormulas[cropKey] || mpFertilizerFormulas.wheat;
+
+            const totalUreaKg = Math.round(formula.ureaKg * acres);
+            const totalDAPKg = Math.round(formula.dapKg * acres);
+            const totalMOPKg = Math.round(formula.mopKg * acres);
+            const totalSSPKg = Math.round(formula.sspKg * acres);
+
+            document.getElementById('resUreaBags').textContent = `${(totalUreaKg / 45).toFixed(1)} बोरी`;
+            document.getElementById('resUreaKg').textContent = `${totalUreaKg} kg`;
+
+            document.getElementById('resDAPBags').textContent = `${(totalDAPKg / 50).toFixed(1)} बोरी`;
+            document.getElementById('resDAPKg').textContent = `${totalDAPKg} kg`;
+
+            document.getElementById('resMOPBags').textContent = `${(totalMOPKg / 50).toFixed(1)} बोरी`;
+            document.getElementById('resMOPKg').textContent = `${totalMOPKg} kg`;
+
+            document.getElementById('resSSPBags').textContent = `${(totalSSPKg / 50).toFixed(1)} बोरी`;
+            document.getElementById('resSSPKg').textContent = `${totalSSPKg} kg`;
+
+            const unitCleanName = unit === 'acre' ? 'एकड़' : 'बीघा';
+            document.getElementById('calcOutputTitle').textContent = `${formula.nameHi} - ${areaVal} ${unitCleanName} हेतु आवश्यक खाद`;
+            document.getElementById('calcAreaTag').textContent = `${areaVal} ${unitCleanName}`;
+
+            const list = document.getElementById('calcSplitsList');
+            list.innerHTML = '';
+            formula.splitsHi.forEach(item => {
+                const li = document.createElement('li');
+                li.className = "flex items-start space-x-2";
+                li.innerHTML = `<i class="fa-solid fa-circle-check text-kisan-600 mt-1 text-xs"></i> <span>${item}</span>`;
+                list.appendChild(li);
+            });
+
+            document.getElementById('calcResultsCard').classList.remove('hidden');
+        }
+
+        function showAppToast(msg) {
+            const toast = document.getElementById('appToast');
+            document.getElementById('appToastText').textContent = msg;
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
