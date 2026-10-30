@@ -1,4 +1,5 @@
 module.exports = async function handler(req, res) {
+  // 1. CORS हेडर - ब्राउज़र सुरक्षा के लिए
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -7,7 +8,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // 1. हेल्थ चेक (GET)
+  // 2. त्वरित हेल्थ चेक (GET)
   if (req.method === 'GET') {
     return res.status(200).json({
       status: 'online',
@@ -22,47 +23,62 @@ module.exports = async function handler(req, res) {
   try {
     const apiKey = (process.env.GEMINI_API_KEY || '').trim();
     if (!apiKey) {
-      return res.status(500).json({ error: 'Vercel में GEMINI_API_KEY सेट नहीं है।' });
+      return res.status(500).json({ error: 'Vercel में GEMINI_API_KEY मौजूद नहीं है।' });
     }
 
     let body = req.body;
     if (typeof body === 'string') {
-      try { body = JSON.parse(body); } catch (e) { body = {}; }
-    }
-    const { prompt, history, image } = body || {};
-
-    if (!prompt && !image) {
-      return res.status(400).json({ error: 'सवाल खाली है।' });
+      try { body = JSON.parse(body); } catch (e) { body = { prompt: body }; }
     }
 
-    // --- Google API के लिए 100% सुरक्षित हिस्ट्री सैनिटाइज़र ---
-    // यह सुनिश्चित करता है कि कभी भी दो समान रोल (user/user) एक साथ न आएँ
-    const sanitizedContents = [];
-    const rawHistory = Array.isArray(history) ? history.slice(-6) : [];
+    // 3. सभी संभावित इनपुट नाम स्वीकार करें (ताकि कोई भी नाम आने पर एरर न आए)
+    const userPrompt = (
+      body?.prompt || 
+      body?.message || 
+      body?.question || 
+      body?.query || 
+      body?.text || 
+      body?.userInput || 
+      ''
+    ).toString().trim();
 
-    for (const msg of rawHistory) {
-      if (!msg || !msg.text || !msg.text.trim()) continue;
-      
-      // फ्रंटएंड किसी भी नाम से रोल भेजे (bot, assistant, model), उसे सही करें
+    const image = body?.image || body?.imageBase64 || body?.photo;
+
+    if (!userPrompt && !image) {
+      return res.status(400).json({ error: 'सवाल खाली है। कृपया अपना सवाल लिखें।' });
+    }
+
+    // 4. सुरक्षित चैट हिस्ट्री निर्माण
+    const contents = [];
+    const rawHistory = Array.isArray(body?.history) 
+      ? body.history 
+      : (Array.isArray(body?.chatHistory) ? body.chatHistory : []);
+
+    for (const msg of rawHistory.slice(-4)) {
+      if (!msg) continue;
       const role = (msg.role === 'user' || msg.sender === 'user') ? 'user' : 'model';
-      const text = msg.text.trim();
+      const text = (msg.text || msg.message || msg.content || '').toString().trim();
+      if (!text) continue;
 
-      // अगर पिछला संदेश भी उसी रोल का था, तो अलग बनाने के बजाय उसी में टेक्स्ट जोड़ें
-      if (sanitizedContents.length > 0 && sanitizedContents[sanitizedContents.length - 1].role === role) {
-        sanitizedContents[sanitizedContents.length - 1].parts[0].text += '\n' + text;
+      if (contents.length > 0 && contents[contents.length - 1].role === role) {
+        contents[contents.length - 1].parts[0].text += '\n' + text;
       } else {
-        sanitizedContents.push({
-          role: role,
-          parts: [{ text: text }]
-        });
+        contents.push({ role, parts: [{ text }] });
       }
     }
 
-    // मौजूदा सवाल को तैयार करें
+    // सिस्टम निर्देश को सीधे सवाल के साथ सुरक्षित जोड़ना (कोई अमान्य API पैरामीटर नहीं)
+    const systemInstructionText = "आप 'कृषि मित्र MP' हैं। म.प्र. के किसानों के लिए 2-3 बुलेट पॉइंट्स में सटीक, सरल और व्यावहारिक कृषि सलाह दें। 15 लीटर पंप नाप और देशी जैविक उपाय शामिल करें।\n\nकिसान का सवाल: ";
+
     const currentParts = [];
-    if (prompt && prompt.trim()) {
-      currentParts.push({ text: prompt.trim() });
+    const fullPromptText = (contents.length === 0) 
+      ? `${systemInstructionText}${userPrompt}` 
+      : userPrompt;
+
+    if (fullPromptText) {
+      currentParts.push({ text: fullPromptText });
     }
+
     if (image) {
       const cleanImage = String(image).replace(/^data:image\/\w+;base64,/, '').trim();
       currentParts.push({
@@ -70,56 +86,39 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // अगर हिस्ट्री के अंत में 'user' था, तो उसमें जोड़ें, अन्यथा नया 'user' टर्न बनाएँ
-    if (sanitizedContents.length > 0 && sanitizedContents[sanitizedContents.length - 1].role === 'user') {
-      sanitizedContents[sanitizedContents.length - 1].parts = [
-        ...sanitizedContents[sanitizedContents.length - 1].parts,
-        ...currentParts
-      ];
+    // हमेशा सुनिश्चित करें कि अंतिम संदेश user का हो
+    if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
+      contents[contents.length - 1].parts.push(...currentParts);
     } else {
-      sanitizedContents.push({
-        role: 'user',
-        parts: currentParts
-      });
+      contents.push({ role: 'user', parts: currentParts });
     }
 
-    // यह सुनिश्चित करें कि पहला संदेश हमेशा 'user' से शुरू हो
-    while (sanitizedContents.length > 0 && sanitizedContents[0].role !== 'user') {
-      sanitizedContents.shift();
+    while (contents.length > 0 && contents[0].role !== 'user') {
+      contents.shift();
     }
 
-    const systemPrompt = `आप 'कृषि मित्र MP' हैं - मध्य प्रदेश के किसानों के लिए समर्पित वरिष्ठ कृषि वैज्ञानिक। आपका ज्ञान JNKVV जबलपुर और RVSKVV ग्वालियर के वैज्ञानिक पैकेजों पर आधारित है। मध्य प्रदेश के मौसम, मिट्टी और फसलों (सोयाबीन, गेहूं, चना, सरसों, लहसुन) के अनुसार बिंदुवार (bullet points) सटीक सलाह दें। रासायनिक दवा का 15 लीटर पंप माप और साथ में देशी जैविक उपाय अवश्य बताएं। जवाब संक्षिप्त और स्पष्ट रखें।`;
-
+    // 5. एकदम शुद्ध, मानक Google पेलोड (बिना किसी प्रयोगात्मक फ़ील्ड के)
     const payload = {
-      contents: sanitizedContents,
-      systemInstruction: {
-        parts: [{ text: systemPrompt }]
-      },
+      contents: contents,
       generationConfig: {
-        maxOutputTokens: 600, // 2-3 सेकंड में पूरा उत्तर देने के लिए
-        temperature: 0.6
+        maxOutputTokens: 500,
+        temperature: 0.7
       }
     };
 
-    // 9 सेकंड का सख्त टाइमआउट (ताकि Vercel का 10s क्रैश कभी न हो)
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8800);
-
+    // वही मॉडल जो आपके खाते में 100% वेरिफाइड हुआ है
     const targetUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
 
     const googleRes = await fetch(targetUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      signal: controller.signal
+      body: JSON.stringify(payload)
     });
-
-    clearTimeout(timeoutId);
 
     if (!googleRes.ok) {
       const errText = await googleRes.text();
       return res.status(googleRes.status).json({
-        error: `Google API Error (${googleRes.status}): ${errText.slice(0, 200)}`
+        error: `Google API Error (${googleRes.status}): ${errText.slice(0, 150)}`
       });
     }
 
@@ -127,15 +126,17 @@ module.exports = async function handler(req, res) {
     const replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!replyText) {
-      return res.status(500).json({ error: 'AI मॉडल से खाली उत्तर प्राप्त हुआ।' });
+      return res.status(500).json({ error: 'मॉडल से उत्तर प्राप्त नहीं हुआ।' });
     }
 
-    return res.status(200).json({ reply: replyText });
+    // वेबसाइट का कोड जिस भी की (key) को पढ़ रहा हो, सबको सही जवाब मिले
+    return res.status(200).json({
+      reply: replyText,
+      message: replyText,
+      response: replyText
+    });
 
   } catch (err) {
-    if (err.name === 'AbortError') {
-      return res.status(504).json({ error: 'Google AI ने उत्तर देने में बहुत अधिक समय लिया, कृपया दोबारा पूछें।' });
-    }
     return res.status(500).json({ error: err.message || 'आंतरिक सर्वर त्रुटि' });
   }
 };
