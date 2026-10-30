@@ -32,7 +32,7 @@ module.exports = async function handler(req, res) {
 
     try {
       const testRes = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -132,8 +132,8 @@ module.exports = async function handler(req, res) {
       systemInstruction: { parts: [{ text: systemPrompt }] }
     };
 
-    // Updated model list with Gemini 2.5 Flash
-    const models = ['gemini-2.5-flash', 'gemini-1.5-flash'];
+    // Google Gemini 1.5 Flash and Pro
+    const models = ['gemini-1.5-flash', 'gemini-1.5-pro'];
     let lastError = null;
     let replyText = null;
 
