@@ -6,12 +6,12 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Pre-flight request
+  // Pre-flight OPTIONS request
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  // Retrieve Environment Variable
+  // API Key fetch
   const apiKey = (
     process.env.GEMINI_API_KEY ||
     process.env.GEMINI_KEY ||
@@ -30,82 +30,68 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  // GET Request (Live Auto-Discovery & Diagnostic)
+  // Models priority list recommended by Google
+  const preferredModels = [
+    'gemini-3.8-flash',
+    'gemini-flash-latest',
+    'gemini-3.5-flash',
+    'gemini-3.7-flash',
+    'gemini-3.1-flash-lite'
+  ];
+
+  // GET Request (Live Testing & Model Verification)
   if (req.method === 'GET') {
-    try {
-      const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-      const listData = await listRes.json();
+    let successData = null;
+    let successfulModel = null;
+    let lastErrorMsg = null;
 
-      if (!listRes.ok) {
-        return res.status(200).json({
-          status: 'error',
-          server: 'online',
-          issue: 'LIST_MODELS_FAILED',
-          code: listRes.status,
-          googleError: listData?.error?.message || JSON.stringify(listData)
-        });
-      }
+    for (const model of preferredModels) {
+      try {
+        const testRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ role: 'user', parts: [{ text: 'नमस्ते किसान मित्र' }] }]
+            })
+          }
+        );
 
-      // Filter all models that support generateContent
-      const available = (listData.models || [])
-        .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes('generateContent'))
-        .map(m => m.name.replace('models/', ''));
-
-      if (available.length === 0) {
-        return res.status(200).json({
-          status: 'error',
-          server: 'online',
-          available_models: [],
-          message: 'आपकी API Key के लिए generateContent वाला कोई भी मॉडल नहीं मिला।'
-        });
-      }
-
-      // Pick flash model if available, else first supported model
-      const preferred = available.find(m => m.includes('flash')) || available[0];
-
-      // Test with a sample greeting
-      const testRes = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${preferred}:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: 'नमस्ते' }] }]
-          })
+        const data = await testRes.json();
+        if (testRes.ok && data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+          successData = data;
+          successfulModel = model;
+          workingModel = model;
+          break;
+        } else {
+          lastErrorMsg = data?.error?.message || JSON.stringify(data);
         }
-      );
-
-      const testData = await testRes.json();
-      if (testRes.ok) {
-        workingModel = preferred;
-        return res.status(200).json({
-          status: 'success',
-          server: 'online',
-          geminiStatus: 'connected',
-          autoDetectedModel: preferred,
-          allAvailableModels: available,
-          sampleReply: testData?.candidates?.[0]?.content?.parts?.[0]?.text,
-          message: 'कृषि मित्र Live AI सर्वर और Google Gemini दोनों 100% चालू हैं!'
-        });
-      } else {
-        return res.status(200).json({
-          status: 'partial_error',
-          available_models: available,
-          triedModel: preferred,
-          googleError: testData?.error?.message || JSON.stringify(testData)
-        });
+      } catch (err) {
+        lastErrorMsg = err.message;
       }
-    } catch (err) {
+    }
+
+    if (successfulModel) {
+      return res.status(200).json({
+        status: 'success',
+        server: 'online',
+        geminiStatus: 'connected',
+        activeModel: successfulModel,
+        sampleReply: successData?.candidates?.[0]?.content?.parts?.[0]?.text,
+        message: 'बधाई! कृषि मित्र Live AI पूरी तरह चालू और कनेक्ट हो चुका है।'
+      });
+    } else {
       return res.status(200).json({
         status: 'error',
         server: 'online',
-        issue: 'FETCH_FAILED',
-        error: err.message
+        issue: 'MODELS_TEST_FAILED',
+        lastGoogleError: lastErrorMsg
       });
     }
   }
 
-  // POST Request (Main Chat Engine)
+  // POST Request (Main Question/Answer Engine)
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'केवल POST और GET अनुरोध समर्थित हैं' });
   }
@@ -158,41 +144,13 @@ module.exports = async function handler(req, res) {
       systemInstruction: { parts: [{ text: systemPrompt }] }
     };
 
-    // Auto-detect list of candidate models dynamically
-    let candidates = [];
-    if (workingModel) candidates.push(workingModel);
+    const modelsToTry = workingModel ? [workingModel, ...preferredModels] : preferredModels;
+    const uniqueModels = [...new Set(modelsToTry)];
 
-    if (candidates.length === 0) {
-      try {
-        const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-        if (listRes.ok) {
-          const listData = await listRes.json();
-          const av = (listData.models || [])
-            .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes('generateContent'))
-            .map(m => m.name.replace('models/', ''));
-          const flashFirst = av.sort((a, b) => (b.includes('flash') ? -1 : 1));
-          candidates.push(...flashFirst);
-        }
-      } catch (e) {
-        // Fallback gracefully
-      }
-    }
-
-    // Static fallback aliases
-    candidates.push(
-      'gemini-1.5-flash-latest',
-      'gemini-1.5-flash-001',
-      'gemini-1.5-flash-002',
-      'gemini-1.5-flash',
-      'gemini-2.0-flash-exp',
-      'gemini-1.5-pro'
-    );
-    candidates = [...new Set(candidates)];
-
-    let lastError = null;
     let replyText = null;
+    let lastError = null;
 
-    for (const model of candidates) {
+    for (const model of uniqueModels) {
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         const googleRes = await fetch(url, {
