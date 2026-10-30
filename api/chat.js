@@ -1,15 +1,15 @@
 module.exports = async function handler(req, res) {
-  // CORS Headers (Browser security fix)
+  // CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Pre-flight request support
+  // Pre-flight request
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  // Health-check support: Browser check kare to instant online status mile
+  // Health-check (GET Request)
   if (req.method === 'GET') {
     return res.status(200).json({ 
       status: 'online', 
@@ -73,8 +73,7 @@ module.exports = async function handler(req, res) {
       systemInstruction: { parts: [{ text: systemPrompt }] }
     };
 
-    // Stable models list
-    const models = ['gemini-1.5-flash', 'gemini-2.0-flash'];
+    const models = ['gemini-2.5-flash', 'gemini-1.5-flash'];
     let lastError = null;
     let replyText = null;
 
@@ -111,4 +110,3 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: err.message || 'सर्वर त्रुटि' });
   }
 };
-```
