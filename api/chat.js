@@ -1,16 +1,25 @@
 ```javascript
 export default async function handler(req, res) {
-  // CORS Headers
+  // CORS Headers (Browser security fix)
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+  // Pre-flight request support
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
+  // Health-check support: Browser ya site check kare to 200 OK mile
+  if (req.method === 'GET') {
+    return res.status(200).json({ 
+      status: 'online', 
+      message: 'कृषि मित्र Live AI सर्वर सक्रिय है।' 
+    });
+  }
+
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'केवल POST अनुरोध समर्थित हैं' });
+    return res.status(405).json({ error: 'केवल POST और GET अनुरोध समर्थित हैं' });
   }
 
   try {
@@ -18,10 +27,12 @@ export default async function handler(req, res) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      return res.status(500).json({ error: 'Vercel में GEMINI_API_KEY सेट नहीं है।' });
+      return res.status(500).json({ 
+        error: 'Vercel Environment Variables में GEMINI_API_KEY नहीं मिली।' 
+      });
     }
 
-    const systemPrompt = `आप 'कृषि मित्र MP' हैं - मध्य प्रदेश के किसानों के लिए समर्पित वरिष्ठ कृषि वैज्ञानिक। आपका ज्ञान JNKVV जबलपुर और RVSKVV ग्वालियर के वैज्ञानिक पैकेजों पर आधारित है। बातचीत का पिछला संदर्भ याद रखें। रासायनिक खाद/दवा का 15 लीटर स्प्रे पंप नाप और साथ में देशी जैविक विकल्प भी दें।`;
+    const systemPrompt = `आप 'कृषि मित्र MP' हैं - मध्य प्रदेश के किसानों के लिए समर्पित वरिष्ठ कृषि वैज्ञानिक। आपका ज्ञान JNKVV जबलपुर और RVSKVV ग्वालियर के वैज्ञानिक पैकेजों पर आधारित है। रासायनिक खाद/दवा का 15 लीटर स्प्रे पंप नाप और साथ में देशी जैविक विकल्प भी दें।`;
 
     const cleanHistory = [];
     if (Array.isArray(history)) {
@@ -53,7 +64,8 @@ export default async function handler(req, res) {
       systemInstruction: { parts: [{ text: systemPrompt }] }
     };
 
-    const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+    // Stable models list
+    const models = ['gemini-1.5-flash', 'gemini-2.0-flash'];
     let lastError = null;
     let replyText = null;
 
@@ -81,7 +93,9 @@ export default async function handler(req, res) {
       }
     }
 
-    if (!replyText) throw lastError || new Error('Google AI से उत्तर नहीं मिला');
+    if (!replyText) {
+      throw lastError || new Error('Google AI से उत्तर नहीं मिला');
+    }
 
     return res.status(200).json({ reply: replyText });
   } catch (err) {
