@@ -9,7 +9,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // Multiple possible Environment Variable names
+  // Environment Variable retrieval
   const apiKey = (
     process.env.GEMINI_API_KEY ||
     process.env.GEMINI_KEY ||
@@ -26,13 +26,13 @@ module.exports = async function handler(req, res) {
         status: 'error',
         server: 'online',
         issue: 'API_KEY_NOT_FOUND',
-        message: 'Vercel Environment Variables में API Key नहीं मिली! Vercel Settings -> Environment Variables में GEMINI_API_KEY चेक करें।'
+        message: 'Vercel Environment Variables में API Key नहीं मिली!'
       });
     }
 
     try {
       const testRes = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -132,7 +132,8 @@ module.exports = async function handler(req, res) {
       systemInstruction: { parts: [{ text: systemPrompt }] }
     };
 
-    const models = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+    // Updated model list with Gemini 2.5 Flash
+    const models = ['gemini-2.5-flash', 'gemini-1.5-flash'];
     let lastError = null;
     let replyText = null;
 
